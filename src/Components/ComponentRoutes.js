@@ -13,6 +13,8 @@ import FundPlanningDashboard from "../Application/FundPlanning/FundPlanningDashb
 import OcrReader from "../Application/ImageReader/OcrReader";
 import FundPlanningConReport from "../Application/FundPlanning/FundPlanningConReport";
 import SalesReportChart from "../Application/FundPlanning/SalesReportChart";
+import POStockAllocation from "../Application/Gold/pages/POStockAllocation";
+import MetalTransferReport from "../Application/Gold/pages/MetalTransferReport";
 // ✅ Use these direct references instead
 const adminIcon = "/images/admin.png";
 const masterApprovalIcon = "/images/approval.png";
@@ -146,7 +148,9 @@ export {
   FundPlanningDashboard,
   OcrReader,
   FundPlanningConReport,
-  SalesReportChart
+  SalesReportChart,
+  POStockAllocation,
+  MetalTransferReport
   // ChildPoTct
   // SupplierOrder
 };

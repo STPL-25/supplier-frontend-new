@@ -705,7 +705,6 @@ const KycDataProvider = ({ children }) => {
     setSuccessMsg("");
     setFileSizes({});
   };
-  console.log("4566666",hallmarkInfo,kycFormData,statutatoryInfo,contactInfo,tradeBusinessInfo,accInfo);
   const handleSubmit = async () => {
     const isValid = validate(kycFormData, filesDatas, fileDatasUrl);
     if (!isValid) {

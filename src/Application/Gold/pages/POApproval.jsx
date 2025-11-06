@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import  { useContext, useEffect, useState } from "react";
 import SubmittedDataComp from "../components/SubmittedDataComp";
 import axios from "axios";
 import { API } from "../../../config/configData";

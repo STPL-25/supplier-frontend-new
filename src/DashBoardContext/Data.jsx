@@ -53,6 +53,8 @@ import {
   SalesReportChart,
   OcrReader,
   FundPlanningConReport,
+  POStockAllocation,
+  MetalTransferReport
 } from "../Components/ComponentRoutes";
 import { DiamondProvider } from "../Application/Diamond/DiamondGridContext/DiamondGridContext";
 import {
@@ -61,7 +63,7 @@ import {
 } from "../Application/KYC/KycContext/KycContex";
 import { RateProvider } from "../Application/RateConfirmation/Context/Ratecontext";
 import { PoProvider } from "../Application/Gold/PoContext/PoContext";
-
+import { Toaster } from "sonner";
 const sectionComponents = {
   "Rate Master": (
     <DiamondProvider>
@@ -148,6 +150,11 @@ const sectionComponents = {
     </RateProvider>
   ),
 
+  "Metal Transferred Report": (
+    <PoProvider>
+      <MetalTransferReport />
+    </PoProvider>
+  ),
   "Master Approval": <MasterApproval />,
   "Diamond Lists Approve": <DiamondAdmin />,
   "Admin Page": <Admin />,
@@ -177,6 +184,14 @@ const sectionComponents = {
   "Fund Planning Report ": <FundPlanning />,
 
   "Fund Transaction Report": <SalesReportChart />,
+    "PO Stock Allocation": 
+    <>
+      <Toaster position="top-right"  />
+      <PoProvider>
+        <POStockAllocation />
+      </PoProvider>
+    </>,
+  
 };
 const sectionImages = {
   "Rate Master": masterpage,
@@ -208,5 +223,6 @@ const sectionImages = {
   "Customer Order Report": hallmark,
   "Retail Rates": bankingicon,
   "Fund Planning": bankingicon,
+  "PO Stock Allocation":masterApprovalIcon 
 };
 export { sectionComponents, sectionImages };
