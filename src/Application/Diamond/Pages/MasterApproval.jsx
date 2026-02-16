@@ -99,6 +99,7 @@ function MasterApproval() {
 
     return (
         <div className="p-4 mt-5">
+
             {/* Supplier Name Autocomplete */}
             <ToastContainer/>
             {/* <Autocomplete
@@ -327,6 +328,8 @@ function MasterApproval() {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+
         </div>
     );
 }

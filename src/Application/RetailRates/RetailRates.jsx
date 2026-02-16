@@ -107,13 +107,31 @@ function RetailRates() {
         }
     };
 
-    const goldCalculations = () => {
+    // const goldCalculations = () => {
+    //     const oldGoldRatesData = parseInt(formValues.goldRate) || 0;
+    //     const karat18RatesData = (parseInt(formValues.goldRate) / 22) * 18 || 0;
+    //     const goldPureRateData = (parseInt(formValues.goldRate) / 22) * 24 || 0;
+    //     const silverPureRateData = parseInt(formValues.silverRate) || 0;
+    //     const goldPureRate1Data = (parseInt(formValues.goldRate) / 93.5) * 100 || 0;
+    //     const goldPureRate2Data = (parseInt(formValues.goldRate) / 93) * 100 || 0;
+    //     setFormValues((prevValues) => ({
+    //         ...prevValues,
+    //         oldGoldRate: Math.round(oldGoldRatesData),
+    //         karat18GoldRate: Math.round(karat18RatesData),
+    //         goldPureRate: Math.round(goldPureRateData),
+    //         silverPureRate: Math.round(silverPureRateData),
+    //         goldPureRate1: Math.round(goldPureRate1Data),
+    //         goldPureRate2: Math.round(goldPureRate2Data),
+    //     }));
+    // };
+
+        const goldCalculations = () => {
         const oldGoldRatesData = parseInt(formValues.goldRate) || 0;
-        const karat18RatesData = (parseInt(formValues.goldRate) / 22) * 18 || 0;
-        const goldPureRateData = (parseInt(formValues.goldRate) / 22) * 24 || 0;
+        const karat18RatesData = (parseInt(formValues.goldRate) / 91.6) * 75|| 0;
+        const goldPureRateData = (parseInt(formValues.goldRate) / 91.6) * 99.99 || 0;
         const silverPureRateData = parseInt(formValues.silverRate) || 0;
-        const goldPureRate1Data = (parseInt(formValues.goldRate) / 93.5) * 100 || 0;
-        const goldPureRate2Data = (parseInt(formValues.goldRate) / 93) * 100 || 0;
+        const goldPureRate1Data = (parseInt(formValues.goldRate) / 91.6) * 99.50 || 0;
+        const goldPureRate2Data = (parseInt(formValues.goldRate) / 91.6) * 99.90 || 0;
         setFormValues((prevValues) => ({
             ...prevValues,
             oldGoldRate: Math.round(oldGoldRatesData),
@@ -131,7 +149,7 @@ function RetailRates() {
 
     // const Branches = ["CBE3", "MTP", "HSR", "KSR", "MYS"];
     const leftPanel = [
-        { header: 'Gold Rate', name: 'goldRate' },
+        { header: 'Gold (91.6) Rate', name: 'goldRate' },
         { header: 'Silver Rate', name: 'silverRate' },
         { header: 'Diamond Rate', name: 'diamondRate' },
         { header: 'Platinum Rate', name: 'platinumRate' },
@@ -139,11 +157,13 @@ function RetailRates() {
     ];
     const rightPanel = [
         { header: 'Old Gold Rate', name: 'oldGoldRate' },
-        { header: '18 Karat Gold Rate', name: 'karat18GoldRate' },
-        { header: 'Gold Pure Rate', name: 'goldPureRate' },
+        { header: 'Gold (99.99 ) Rate', name: 'goldPureRate' },
+        { header: 'Gold (99.90 ) Rate', name: 'goldPureRate2' },
+        { header: 'Gold (99.50 ) Rate', name: 'goldPureRate1' },
+         { header: 'Gold (75.00 ) Rate', name: 'karat18GoldRate' },
+
         { header: 'Silver Pure Rate', name: 'silverPureRate' },
-        { header: 'Gold Pure Rate 1', name: 'goldPureRate1' },
-        { header: 'Gold Pure Rate 2', name: 'goldPureRate2' },
+        
     ];
 
     const handleGenerateOtp = async () => {

@@ -168,7 +168,7 @@ const handleRejectConfirm = async () => {
     
     await axios.post(`${API}/reject-fix-order`, {
       orderId: selectedOrder.sno,
-      rejectedBy: user.name || user.email,
+      rejectedBy: user,
       rejectedAt: new Date().toISOString(),
       rejectionReason: rejectReason,
     });

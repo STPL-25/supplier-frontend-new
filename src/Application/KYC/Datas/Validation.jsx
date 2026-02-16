@@ -163,10 +163,7 @@ const validateStatutoryInfo = (statutatoryInfo) => {
     // Trade Name
     if (!statutatoryInfo.tradename.trim()) {
         tempErrors.tradename = "Trade Name is required.";
-    } else if (!/^[a-zA-Z\s&'-]+$/.test(statutatoryInfo.tradename)) {
-        // Example: allows letters, numbers, spaces, ampersands, apostrophes, and hyphens
-        tempErrors.tradename = "Invalid trade name";
-    } else if (statutatoryInfo.tradename.length < 3) {
+    }  else if (statutatoryInfo.tradename.length < 3) {
         // Example: ensuring trade name is at least 3 characters long
         tempErrors.tradename = "Trade Name must be at least 3 characters.";
     }
@@ -209,29 +206,30 @@ const validateStatutoryInfo = (statutatoryInfo) => {
         tempErrors.tradearea = "Invaild Area Format";
     }
     // State Code
-    if (!statutatoryInfo.tradestatecode.trim()) {
+    if (!statutatoryInfo?.tradestatecode) {
         tempErrors.tradestatecode = "State Code is required.";
-    } else if (!/^\d+$/.test(statutatoryInfo.tradestatecode)) {
+    } else if (!/^\d+$/.test(statutatoryInfo?.tradestatecode)) {
         tempErrors.tradestatecode = "State Code must contain only numbers.";
     }
-    else if (statutatoryInfo.tradestatecode.length > 2) {
+    else if (statutatoryInfo?.tradestatecode?.length > 2) {
         tempErrors.tradestatecode = "State Code must have Two numbers.";
     }
 
 
     // Pin Code
-    if (!statutatoryInfo.tradepincode.trim()) {
+    if (!statutatoryInfo?.tradepincode) {
         tempErrors.tradepincode = "Pin Code is required.";
-    } else if (!/^\d{6}$/.test(statutatoryInfo.tradepincode)) {
+    } else if (!/^\d{6}$/.test(statutatoryInfo?.tradepincode)) {
         tempErrors.tradepincode = "Pin Code must be 6 digits.";
     }
 
     // Date Of Incorporation
     if (!statutatoryInfo.tradeDoI.trim()) {
         tempErrors.tradeDoI = "Date of Incorporation is required.";
-    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(statutatoryInfo.tradeDoI)) {
-        tempErrors.tradeDoI = "Date of Incorporation must be in YYYY-MM-DD format.";
-    }
+    } 
+    // else if (!/^\d{4}-\d{2}-\d{2}$/.test(statutatoryInfo.tradeDoI)) {
+    //     tempErrors.tradeDoI = "Date of Incorporation must be in YYYY-MM-DD format.";
+    // }
     else {
         const enteredDate = new Date(statutatoryInfo.tradeDoI);
         const currentDate = new Date();

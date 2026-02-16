@@ -192,6 +192,29 @@ export const getFormFields = (
         placeholder: 'Enter name',
         gridClass: 'col-span-full',
       },
+      ...(formData?.from?.poPreFix !== 'TCT' ? [{
+    section: 'Rate',
+    field: 'rate',
+    label: 'Rate',
+    type: 'text',
+    required: true,
+    placeholder: 'Enter rate',
+    gridClass: 'col-span-full',
+  }] : []),
+       {
+        section: 'Hallmark Details',
+        field: 'hallmarking',
+        label: 'Hallmarking',
+        type: 'radio',
+        options: [
+          { name: 'Add Hallmarking', value: 'add_hallmark', label: 'Add Hallmarking' },
+          { name: 'Included In Bill', value: 'included_in_bill', label: 'Included In Bill' },
+          { name: 'Marking By Own', value: 'marking_by_own', label: 'Marking By Own' },
+          { name: 'Hallmark by Own', value: 'hallmark_by_own', label: 'Hallmark by Own' },
+        ],
+        gridClass: 'col-span-full',
+      },
+       
       {
         section: 'delivery',
         field: 'locationType',
@@ -210,7 +233,7 @@ export const getFormFields = (
         type: 'radio',
         required: true,
         options: [
-          { name: 'paymentType', value: 'RTGS', label: 'RTGS' },
+          { name: 'paymentType', value: 'RSB', label: 'RTGS' },{ name: 'paymentType', value: 'IV', label: 'Issue Voucher' },
           ...(formData?.from?.poPreFix !== 'TCT'
             ? [{ name: 'paymentType', value: 'MSB', label: 'MSB' }]
             : []),

@@ -111,7 +111,7 @@ const POPage = ({
   const approvedBy = data[0].poApprovedBy;
   const approvedTime = data[0].poApprovedDate;
   const parsedMoment = moment(approvedTime);
-  
+  const type=data[0].type;
   const dateOnly = parsedMoment.format("YYYY-MM-DD");
   const timeOnly = parsedMoment.format("HH:mm:ss");
 
@@ -300,9 +300,16 @@ const POPage = ({
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           {columns.map((col, index) => (
+
+          <>
+            {col.header==='Rate'?
+            <View key={index} style={[styles.tableCell, { width: col.width }]}>
+              <Text style={styles.tableHeaderCell}>{`${type} ${col.header}`}</Text>
+            </View>:
             <View key={index} style={[styles.tableCell, { width: col.width }]}>
               <Text style={styles.tableHeaderCell}>{col.header}</Text>
-            </View>
+            </View>}
+            </>
           ))}
         </View>
 

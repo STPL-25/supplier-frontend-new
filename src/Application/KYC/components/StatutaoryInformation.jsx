@@ -16,30 +16,7 @@ function StatutaoryInformation() {
     } = useContext(KycContext);
     
     const { setActiveSection, setActiveComponent } = useContext(DashBoardContext);
-  useEffect(() => {
-    const fetchGstData=async()=>{
-        
-    try {
-        const response= await axios.post(`${API}/Get_GSTN_Details`, { gst: kycFormData?.gst});
-        const gstData=response.data;
-        setStatutatoryInfo((prevInfo) => ({
-            ...prevInfo,
-             tradename: gstData?.TradeName || "",
-            readablelegalname: gstData?.LegalName || "",
-            tradedoorno: gstData?.AddrBno || "",
-            tradestreet: gstData?.AddrSt || "",
-            tradearea: gstData?.AddrLoc || "",
-            tradestatecode: gstData?.StateCode || "",
-            tradepincode: gstData?.AddrPncd || "",
-            tradeDoI: gstData?.DtReg || "",
-        }));
-       
-    } catch (error) {
-        console.log(error)
-    }
-}
-  fetchGstData()
-  }, [kycFormData?.gst]);
+
     // Function to validate the entire form
     const handleValidate = () => {
         const validationErrors = validateStatutoryInfo(statutatoryInfo);
@@ -234,7 +211,7 @@ function StatutaoryInformation() {
                             {/* Date Of Incorporation */}
                             <div className="mb-6">
                                 <label className="mb-2 block text-sm sm:text-base font-medium text-black">
-                                    Date Of Incorporation:
+                                    Date Of Incorporation (As per Pan Card ):
                                 </label>
                                 <input
                                     type="date"

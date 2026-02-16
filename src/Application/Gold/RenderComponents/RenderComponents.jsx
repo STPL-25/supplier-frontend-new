@@ -522,6 +522,24 @@ const RenderStep = () => {
                           />
                           <span className="ml-2 text-sm text-gray-700">RTGS</span>
                         </label>
+                         <label className="inline-flex items-center">
+                          <input
+                            type="radio"
+                            name="Issue Voucher"
+                            value="Issue Voucher"
+                            checked={formData.delivery.paymentType === "Issue Voucher"}
+                            onChange={(e) =>
+                              handleInputChange(
+                                "delivery",
+                                "Issue Voucher",
+                                e.target.value,
+                                "3"
+                              )
+                            }
+                            className="form-radio h-4 w-4 text-blue-600"
+                          />
+                          <span className="ml-2 text-sm text-gray-700">RTGS</span>
+                        </label>
                         <label className="inline-flex items-center">
                           <input
                             type="radio"

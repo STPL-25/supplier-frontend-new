@@ -117,7 +117,7 @@ const POPage = ({
   const parsedMoment = moment(approvedTime);
   const dateOnly = parsedMoment.format("YYYY-MM-DD"); // e.g., "2025-03-31"
   const timeOnly = parsedMoment.format("HH:mm:ss"); // e.g., "17:15:44"
-
+  const type=data[0].type;
   return (
     <Page size="A4" style={styles.page}>
       {/* {console.log(orderTypes)} */}
@@ -342,7 +342,7 @@ const POPage = ({
                       return "-";
                     }
                   })()} */}
-                   {poAddressData?.payment_Type||"-"}
+                   {poAddressData?.payment_Type||"IV"}
                 </Text>
               </Text>
               <Text style={styles.label}>
@@ -373,9 +373,15 @@ const POPage = ({
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           {columns.map((col, index) => (
+            <>
+            {col.header==='Rate'?
+            <View key={index} style={[styles.tableCell, { width: col.width }]}>
+              <Text style={styles.tableHeaderCell}>{`${type} ${col.header}`}</Text>
+            </View>:
             <View key={index} style={[styles.tableCell, { width: col.width }]}>
               <Text style={styles.tableHeaderCell}>{col.header}</Text>
-            </View>
+            </View>}
+            </>
           ))}
         </View>
 
@@ -699,22 +705,38 @@ export const useSendToServer = ({
       formData.append("phoneNumber", poData?.supplier?.phone ?? "");
       formData.append("user", userRole);
       let response;
-      if(poType&&poType=="unfix"){
+
+
         response = await axios.post(`${API}/gold_po/upload-po`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      // if(poType&&poType=="unfix"){
+      //   response = await axios.post(`${API}/gold_po/upload-po`, formData, {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data",
+      //   },
+      // });
 
-      }
+      // }
 
-      else if(poType&&poType==="fix"){
-          response = await axios.post(`${API}/gold_Po/upload-po-to-ftp`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      }
+      //    if(poType&&poType=="fix"){
+      //   response = await axios.post(`${API}/gold_po/upload-po`, formData, {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data",
+      //   },
+      // });
+
+      // }
+
+      // else if(poType&&poType==="fix"){
+      //     response = await axios.post(`${API}/gold_Po/upload-po-to-ftp`, formData, {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data",
+      //   },
+      // });
+      // }
 
       if (response&&response?.status === 200) {
         // Call the callback if provided

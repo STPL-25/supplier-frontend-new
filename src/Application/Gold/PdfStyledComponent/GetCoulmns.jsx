@@ -261,6 +261,7 @@
 
 export const getColumns = (data) => {
     // Guard clause for empty data
+    console.log(data)
     if (!data || data.length === 0) {
         return [];
     }
@@ -273,7 +274,7 @@ export const getColumns = (data) => {
     const showProductName = data.some(item => item.orderType !== "office");
     const showAdditionalColumns = data.some(item => item.productWeightage !== "Pcs");
     const showGoldPlatinumDiamond = data.some(item => item.metal_type === "Gold_Diamond_Platinum");
-    
+    const type=data[0].type;
     // Define base columns (default configuration)
     const baseColumns = [
         { 
@@ -293,7 +294,7 @@ export const getColumns = (data) => {
         },
         { 
             width: "10%", 
-            field: "rate", 
+            field: 'rate', 
             header: "Rate" 
         },
         // { 

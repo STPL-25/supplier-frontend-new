@@ -8,6 +8,7 @@ import {
 } from "react";
 import PropTypes from "prop-types";
 import { DashBoardContext } from "../../../DashBoardContext/DashBoardContext";
+import { ca } from "date-fns/locale/ca";
 const PoContext = createContext();
 const PoProvider = ({ children }) => {
   // const navigate = useNavigate();
@@ -221,6 +222,9 @@ const PoProvider = ({ children }) => {
     productWeightage: "Gram",
     goldwt: "",
     platinumWt: "",
+    catagoryCode: "",
+    categoryName: "",
+    
   });
   const [errors, setErrors] = useState({});
   const [selectedTypes, setSelectedTypes] = useState({

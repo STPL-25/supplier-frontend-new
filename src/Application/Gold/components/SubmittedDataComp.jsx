@@ -673,11 +673,16 @@ function SubmittedDataComp({
         const poData = response.data.poData;
         const orderTypes = response.data.orderTypes;
         const poType = response.data.poType;
-        console.log(poData)
-        if(!poData[0]?.poNumber?.includes("TCT")){
+        const poNumber=response.data.poNumber;
+        console.log(poData,filteredItems,orderTypes,poType)
+        // if(!poData[0]?.poNumber?.includes("TCT")){
+        //   console.log('11111111111111111111111',poData[0]?.poNumber)
+        // await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
+        // }
+          if(!poNumber?.includes("TCT")){
+          console.log('11111111111111111111111',poData[0]?.poNumber)
         await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
         }
-        
         // if (poData.parentPo.name && poData.parentPo.subTitle) {
         //   await generateTctPdf(filteredItems, poData, orderTypes);
         // }
@@ -937,6 +942,10 @@ function SubmittedDataComp({
         const orderTypes = response.data.orderTypes;
         const poType = response.data.poType;
         console.log("11111111111111", poData);
+        //     if(!poNumber?.includes("TCT")){
+        //   console.log('11111111111111111111111',poData[0]?.poNumber)
+        // await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
+        // }
         if (!filteredItems[0].poNumber.includes("TCT")) {
           await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
         }

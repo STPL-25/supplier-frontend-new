@@ -54,7 +54,14 @@ import {
   OcrReader,
   FundPlanningConReport,
   POStockAllocation,
-  MetalTransferReport
+  MetalTransferReport,
+  KYCReport,
+  SupplierKYCOrderStatus,
+  ExcelUploader,
+  GoogleSheetsPurchaseManager,
+  PurchaseReport,
+  DebitCreditNotePage,
+  SupPurchaseReport
 } from "../Components/ComponentRoutes";
 import { DiamondProvider } from "../Application/Diamond/DiamondGridContext/DiamondGridContext";
 import {
@@ -184,6 +191,7 @@ const sectionComponents = {
   "Fund Planning Report ": <FundPlanning />,
 
   "Fund Transaction Report": <SalesReportChart />,
+  "Kyc Status Report":<KYCReport/>,
     "PO Stock Allocation": 
     <>
       <Toaster position="top-right"  />
@@ -191,6 +199,35 @@ const sectionComponents = {
         <POStockAllocation />
       </PoProvider>
     </>,
+    "Supplier KYC Order Status": (
+      <KycDataProvider>
+        <SupplierKYCOrderStatus />
+      </KycDataProvider>
+    ),
+    "Diamond Excel Uploader": (
+      <DiamondProvider>
+        <ExcelUploader />
+      </DiamondProvider>
+    ),
+    "Diamond Purchase Entry Report": (
+      <DiamondProvider>
+        <PurchaseReport />
+      </DiamondProvider>
+    ),
+
+   "Diamond Supplier Purchase Entry Report": (
+      <DiamondProvider>
+        <SupPurchaseReport />
+      </DiamondProvider>
+    ),
+    
+    //   "Diamond Excel Uploader": (
+    //   <DiamondProvider>
+    //     <GoogleSheetsPurchaseManager />
+    //   </DiamondProvider>
+    // ),
+    "Credit Note And Debit Note": <DebitCreditNotePage />,
+
   
 };
 const sectionImages = {
@@ -223,6 +260,7 @@ const sectionImages = {
   "Customer Order Report": hallmark,
   "Retail Rates": bankingicon,
   "Fund Planning": bankingicon,
-  "PO Stock Allocation":masterApprovalIcon 
+  "PO Stock Allocation":masterApprovalIcon ,
+  "View Kyc": KycViewImage,
 };
 export { sectionComponents, sectionImages };

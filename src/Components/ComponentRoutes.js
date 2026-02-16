@@ -15,6 +15,13 @@ import FundPlanningConReport from "../Application/FundPlanning/FundPlanningConRe
 import SalesReportChart from "../Application/FundPlanning/SalesReportChart";
 import POStockAllocation from "../Application/Gold/pages/POStockAllocation";
 import MetalTransferReport from "../Application/Gold/pages/MetalTransferReport";
+import KYCReport from "../Application/KYC/pages/KycReport";
+import SupplierKYCOrderStatus from "../Application/KYC/pages/SupplierKYCOrderStatus";
+import ExcelUploader from "../Application/Diamond/FunctionalComponents/ExcelUploader";
+import GoogleSheetsPurchaseManager from "../Application/Diamond/FunctionalComponents/GoogleSheetUploader";
+import PurchaseReport from "../Application/Diamond/FunctionalComponents/DiaPurchaseReport";
+import DebitCreditNotePage from "../Application/DebitNoteAndCreditNote/DebitCreditNotePage";
+import SupPurchaseReport from "../Application/Diamond/FunctionalComponents/DiaSupPurchaseReport";
 // ✅ Use these direct references instead
 const adminIcon = "/images/admin.png";
 const masterApprovalIcon = "/images/approval.png";
@@ -150,7 +157,14 @@ export {
   FundPlanningConReport,
   SalesReportChart,
   POStockAllocation,
-  MetalTransferReport
+  MetalTransferReport,
+  KYCReport,
+  SupplierKYCOrderStatus,
+  ExcelUploader,
+  GoogleSheetsPurchaseManager,
+  PurchaseReport,
+  DebitCreditNotePage,
+  SupPurchaseReport
   // ChildPoTct
   // SupplierOrder
 };
