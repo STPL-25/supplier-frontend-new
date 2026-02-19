@@ -84,6 +84,10 @@ const PurchaseOrderDialog = ({
       purchaseIncharge: { required: true, message: "Purchase Incharge is required" },
       purchaseManager: { required: true, message: "Purchase Manager is required" },
     },
+    "Hallmark Details": {
+      hallmarking: { required: true, message: "Hallmarking is required" },
+
+    },
     delivery: {
       address: { required: true, message: "Delivery address is required" },
       paymentType: { required: true, message: "Payment Type is required" },

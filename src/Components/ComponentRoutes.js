@@ -17,7 +17,8 @@ import POStockAllocation from "../Application/Gold/pages/POStockAllocation";
 import MetalTransferReport from "../Application/Gold/pages/MetalTransferReport";
 import KYCReport from "../Application/KYC/pages/KycReport";
 import SupplierKYCOrderStatus from "../Application/KYC/pages/SupplierKYCOrderStatus";
-import ExcelUploader from "../Application/Diamond/FunctionalComponents/ExcelUploader";
+// import ExcelUploader from "../Application/Diamond/FunctionalComponents/ExcelUploader";
+import DiamondManager from "../Application/Diamond/FunctionalComponents/ExcelUploader";
 import GoogleSheetsPurchaseManager from "../Application/Diamond/FunctionalComponents/GoogleSheetUploader";
 import PurchaseReport from "../Application/Diamond/FunctionalComponents/DiaPurchaseReport";
 import DebitCreditNotePage from "../Application/DebitNoteAndCreditNote/DebitCreditNotePage";
@@ -160,7 +161,7 @@ export {
   MetalTransferReport,
   KYCReport,
   SupplierKYCOrderStatus,
-  ExcelUploader,
+  DiamondManager,
   GoogleSheetsPurchaseManager,
   PurchaseReport,
   DebitCreditNotePage,

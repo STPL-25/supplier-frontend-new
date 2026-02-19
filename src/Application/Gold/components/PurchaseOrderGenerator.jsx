@@ -94,7 +94,7 @@ const POPage = ({
   pdfType,
 }) => {
   const columns = getColumns(data);
-  
+  console.log("data", data);
   const phoneNumber =
     data[0].metal_type === "Gold"
       ? "+91 9629570888, +91 9789680888"
@@ -106,7 +106,8 @@ const POPage = ({
         data[0].metal_type === "Platinum"
       ? "9790527888"
       : "";
-  
+  const catagory = data[0].CATEGORYNAME || "";
+  const hallmarking = data[0].hallmark || "";
   const isTct = data[0].poNumber?.includes("TCT");
   const approvedBy = data[0].poApprovedBy;
   const approvedTime = data[0].poApprovedDate;
@@ -244,6 +245,11 @@ const POPage = ({
               Mode:{" "}
               <Text style={styles.value}>{poAddressData?.poDetails?.mode}</Text>
             </Text>
+              <Text style={styles.label}>
+              Category:{" "}
+              <Text style={styles.value}>{catagory||""}</Text>{" "}
+           
+            </Text>
             <Text style={styles.label}>
               Pur Managers:{" "}
               <Text style={styles.value}>
@@ -285,6 +291,10 @@ const POPage = ({
                   <Text style={styles.label}>
                     Payment Type{" "}
                     <Text style={styles.value}>{deliveryData?.paymentType ?? "-"}</Text>
+                  </Text>
+                    <Text style={styles.label}>
+                    Hallmark Type{" "}
+                    <Text style={styles.value}>{hallmarking}</Text>
                   </Text>
                   <Text style={styles.label}>
                     Location Type{" "}

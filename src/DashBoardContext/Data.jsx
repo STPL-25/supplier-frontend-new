@@ -57,7 +57,7 @@ import {
   MetalTransferReport,
   KYCReport,
   SupplierKYCOrderStatus,
-  ExcelUploader,
+  DiamondManager,
   GoogleSheetsPurchaseManager,
   PurchaseReport,
   DebitCreditNotePage,
@@ -206,7 +206,7 @@ const sectionComponents = {
     ),
     "Diamond Excel Uploader": (
       <DiamondProvider>
-        <ExcelUploader />
+        <DiamondManager />
       </DiamondProvider>
     ),
     "Diamond Purchase Entry Report": (

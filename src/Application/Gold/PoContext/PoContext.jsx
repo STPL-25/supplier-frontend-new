@@ -224,6 +224,9 @@ const PoProvider = ({ children }) => {
     platinumWt: "",
     catagoryCode: "",
     categoryName: "",
+    sectionCode: "",
+    sectionName: "",
+  
     
   });
   const [errors, setErrors] = useState({});

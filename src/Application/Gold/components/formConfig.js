@@ -192,26 +192,19 @@ export const getFormFields = (
         placeholder: 'Enter name',
         gridClass: 'col-span-full',
       },
-      ...(formData?.from?.poPreFix !== 'TCT' ? [{
-    section: 'Rate',
-    field: 'rate',
-    label: 'Rate',
-    type: 'text',
-    required: true,
-    placeholder: 'Enter rate',
-    gridClass: 'col-span-full',
-  }] : []),
+    
        {
         section: 'Hallmark Details',
         field: 'hallmarking',
         label: 'Hallmarking',
         type: 'radio',
         options: [
-          { name: 'Add Hallmarking', value: 'add_hallmark', label: 'Add Hallmarking' },
-          { name: 'Included In Bill', value: 'included_in_bill', label: 'Included In Bill' },
-          { name: 'Marking By Own', value: 'marking_by_own', label: 'Marking By Own' },
-          { name: 'Hallmark by Own', value: 'hallmark_by_own', label: 'Hallmark by Own' },
+          { name: 'Separate Bill', value: 'Separate Bill', label: 'Separate Bill' },
+          { name: 'Included In Bill', value: 'Included In Bill', label: 'Included In Bill' },
+          { name: 'Marking By Own', value: 'Marking By Own', label: 'Marking By Own' },
+          { name: 'Hallmark by Own', value: 'Hallmark by Own', label: 'Hallmark by Own' },
         ],
+         required: true,
         gridClass: 'col-span-full',
       },
        

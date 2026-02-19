@@ -54,6 +54,7 @@ const PurchaseOrderPreview = ({ datas, supplierDetails }) => {
 
   const totals = calculateTotals(datas);
   const isTct = supplierDetails?.poDetails?.poNumber?.includes("TCT");
+  const poType=datas[0]?.type
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden">
       {/* Header */}
@@ -174,11 +175,12 @@ const PurchaseOrderPreview = ({ datas, supplierDetails }) => {
                     Product
                   </th>
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
+                   {poType} Rate
                   </th>
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Pieces
                   </th>
+              
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Gross Wt
                   </th>
@@ -207,8 +209,11 @@ const PurchaseOrderPreview = ({ datas, supplierDetails }) => {
                       <td className="p-3 text-sm text-gray-900">
                         { data.product_name || "-"}
                       </td>
-                      <td className="p-3 text-sm text-gray-900">
+                      {/* <td className="p-3 text-sm text-gray-900">
                         {data.productType || "-"}
+                      </td> */}
+                      <td className="p-3 text-sm text-gray-900">
+                        {data.rate || "-"}
                       </td>
                       <td className="p-3 text-sm text-gray-900">
                         {data.pieces || "-"}
