@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { FileSpreadsheet, Download } from 'lucide-react';
-import { generateWorkbook } from '../../utils/excelBuilder';
-import { COLUMN_HEADER_MAP, PT_COLUMNS, GOLD_COLUMNS } from '../../constants/diamondConstants';
-
+import { generateWorkbook } from '../utils/excelBuilder';
+import { COLUMN_HEADER_MAP, PT_COLUMNS, GOLD_COLUMNS } from '../constants/diamondConstants';
 /**
  * Props:
  *   supplierName  – string (pre-filled in Excel B2)

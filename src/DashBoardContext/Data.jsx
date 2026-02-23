@@ -61,7 +61,8 @@ import {
   GoogleSheetsPurchaseManager,
   PurchaseReport,
   DebitCreditNotePage,
-  SupPurchaseReport
+  SupPurchaseReport,
+  QCCheckReport
 } from "../Components/ComponentRoutes";
 import { DiamondProvider } from "../Application/Diamond/DiamondGridContext/DiamondGridContext";
 import {
@@ -218,6 +219,11 @@ const sectionComponents = {
    "Diamond Supplier Purchase Entry Report": (
       <DiamondProvider>
         <SupPurchaseReport />
+      </DiamondProvider>
+    ),
+    "QC Check Report": (
+      <DiamondProvider>
+        <QCCheckReport />
       </DiamondProvider>
     ),
     

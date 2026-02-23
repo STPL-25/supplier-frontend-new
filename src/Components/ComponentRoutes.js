@@ -18,11 +18,13 @@ import MetalTransferReport from "../Application/Gold/pages/MetalTransferReport";
 import KYCReport from "../Application/KYC/pages/KycReport";
 import SupplierKYCOrderStatus from "../Application/KYC/pages/SupplierKYCOrderStatus";
 // import ExcelUploader from "../Application/Diamond/FunctionalComponents/ExcelUploader";
-import DiamondManager from "../Application/Diamond/FunctionalComponents/ExcelUploader";
+// import DiamondManager from "../Application/Diamond/FunctionalComponents/ExcelUploader";
+import DiamondManager from "../Application/DiamondPurEntry/components/DiamondManager";
 import GoogleSheetsPurchaseManager from "../Application/Diamond/FunctionalComponents/GoogleSheetUploader";
 import PurchaseReport from "../Application/Diamond/FunctionalComponents/DiaPurchaseReport";
 import DebitCreditNotePage from "../Application/DebitNoteAndCreditNote/DebitCreditNotePage";
 import SupPurchaseReport from "../Application/Diamond/FunctionalComponents/DiaSupPurchaseReport";
+import QCCheckReport from "../Application/DiamondPurEntry/components/QCCheckReport";
 // ✅ Use these direct references instead
 const adminIcon = "/images/admin.png";
 const masterApprovalIcon = "/images/approval.png";
@@ -165,7 +167,8 @@ export {
   GoogleSheetsPurchaseManager,
   PurchaseReport,
   DebitCreditNotePage,
-  SupPurchaseReport
+  SupPurchaseReport,
+  QCCheckReport
   // ChildPoTct
   // SupplierOrder
 };
