@@ -21,9 +21,11 @@ import SupplierKYCOrderStatus from "../Application/KYC/pages/SupplierKYCOrderSta
 // import DiamondManager from "../Application/Diamond/FunctionalComponents/ExcelUploader";
 import DiamondManager from "../Application/DiamondPurEntry/components/DiamondManager";
 import GoogleSheetsPurchaseManager from "../Application/Diamond/FunctionalComponents/GoogleSheetUploader";
-import PurchaseReport from "../Application/Diamond/FunctionalComponents/DiaPurchaseReport";
+// import PurchaseReport from "../Application/Diamond/FunctionalComponents/DiaPurchaseReport";
+import PurchaseReport from "../Application/DiamondPurEntry/components/DiaPurReport";
 import DebitCreditNotePage from "../Application/DebitNoteAndCreditNote/DebitCreditNotePage";
-import SupPurchaseReport from "../Application/Diamond/FunctionalComponents/DiaSupPurchaseReport";
+// import SupPurchaseReport from "../Application/Diamond/FunctionalComponents/DiaSupPurchaseReport";
+import SupPurchaseReport from "../Application/DiamondPurEntry/components/SupReport";
 import QCCheckReport from "../Application/DiamondPurEntry/components/QCCheckReport";
 // ✅ Use these direct references instead
 const adminIcon = "/images/admin.png";

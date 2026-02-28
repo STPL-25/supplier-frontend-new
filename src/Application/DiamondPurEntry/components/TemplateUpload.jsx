@@ -315,7 +315,7 @@ const isRowComplete = (rawRow) =>
 const getDefaultValue = (fieldName, value) => {
   if (value !== null && value !== undefined && value !== '') return value;
   const dataType = FIELD_DATA_TYPES[fieldName];
-  const requiredStrings = ['SupplierName', 'ProductName', 'DesignNo', 'MetalType', 'WtMode', 'suppCode', 'invoiceNumber'];
+  const requiredStrings = ['SupplierName', 'ProductName', 'DesignNo', 'MetalType', 'WtMode', 'suppCode', 'invoiceNumber','po_number'];
   switch (dataType) {
     case 'int':     return 0;
     case 'decimal': return 0;
@@ -541,8 +541,9 @@ const TemplateUpload = ({ onDataLoaded, onReset, loginUser }) => {
         // ── Read header cells (rows 2–5) ───────────────────────────────────
         const supplierName  = String(mainSheet['B2']?.v || '').trim();
         const supplierCode  = String(mainSheet['B3']?.v || '').trim();
-        const invoiceNumber = mainSheet['B4']?.v || '';
-        const invoiceDate   = parseExcelDate(mainSheet['B5']?.v || '');
+        const poNumber      = String(mainSheet['B4']?.v || '').trim();
+        const invoiceNumber = mainSheet['B5']?.v || '';
+        const invoiceDate   = parseExcelDate(mainSheet['B6']?.v || '');
         console.log('invoiceDate:', invoiceDate);
         const invoiceRef    = invoiceNumber ? `${invoiceNumber}|${invoiceDate}` : '';
 
@@ -703,7 +704,7 @@ const TemplateUpload = ({ onDataLoaded, onReset, loginUser }) => {
         setSkippedRows(skipped); // show skipped notice even on success
         setStatus({
           type: 'success',
-          message: `✓ Loaded ${grouped.length} entries for ${supplierName || 'Unknown Supplier'}${
+          message: `Loaded ${grouped.length} entries for ${supplierName || 'Unknown Supplier'}${
             skipped.length ? ` (${skipped.length} incomplete rows skipped)` : ''
           }`,
         });

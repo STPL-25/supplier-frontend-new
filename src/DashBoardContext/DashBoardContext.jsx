@@ -18,7 +18,7 @@ const DashBoardContextProvider = ({ children }) => {
   const [tk, setTk] = useState("");
   const [activeComponent, setActiveComponent] = useState("");
   const [roleData,setRoleData]=useState("")
-  
+  const [suppCode,setSuppCode]=useState("")
 
   const decryptToken = (encryptedToken) => {
     const secretKey = import.meta.env.VITE_API_SECREAT_KEY;
@@ -28,7 +28,17 @@ const DashBoardContextProvider = ({ children }) => {
   };
   console.log(logginToken);
  
-  let tokens = localStorage.getItem("token");
+ const fetchSupplierData = async (companyname) => {
+  try {
+     const supplierData = await axios.get(`${LOGG_API}/get_supplier_details/${companyname}`);
+  console.log("supplier",supplierData)
+  return supplierData;
+  } catch (error) {
+    console.log(error)
+  }
+ 
+ }
+   let tokens = localStorage.getItem("token");
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -42,6 +52,12 @@ const DashBoardContextProvider = ({ children }) => {
           const companyName = decodedToken.companyName;
           const setSignCatagorys = decodedToken.signUpCatagory;
           const managerRoleData=decodedToken.roleData
+          let supplierData
+          console.log("companyName",companyName)
+          if(companyName){
+           supplierData = await fetchSupplierData(companyName);
+          }
+          setSuppCode(supplierData?.data?.Suppcode||"")
           setTk(Securedtoken);
           setUserRole(role);
           setNames(name);
@@ -102,7 +118,7 @@ console.log(names);
         sectionComponents,
         sectionImages,
         activeComponent, setActiveComponent,
-        roleData
+        roleData,suppCode
         //  kycUserData,setApprovedData, statusUpdate,
       }}
     >

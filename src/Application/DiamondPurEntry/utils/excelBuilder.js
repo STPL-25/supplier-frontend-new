@@ -135,7 +135,7 @@ const buildDropdownListsSheet = () => {
 
 
 // ─── Build Purchase Entry Sheet ───────────────────────────────────────────────
-export const buildSheet = (columns, supplierName, supplierCode, titleText, DATA_ROWS = 200) => {
+export const buildSheet = (columns, supplierName, supplierCode, titleText, poNumber, DATA_ROWS = 200) => {
   const ws = {};
 
   // Build colMap: display name → column letter (e.g. 'Gold Wt' → 'H')
@@ -161,8 +161,10 @@ export const buildSheet = (columns, supplierName, supplierCode, titleText, DATA_
   [
     ['A2', 'Supplier Name:'],
     ['A3', 'Supplier Code:'],
-    ['A4', 'Invoice Number:'],
-    ['A5', 'Invoice Date:'],
+     ['A4', 'Po Number:'],
+    ['A5', 'Invoice Number:'],
+    ['A6', 'Invoice Date:'],
+    // ['C4', 'Po Number:'],
   ].forEach(([addr, val]) => {
     ws[addr] = {
       v: val, t: 's',
@@ -193,12 +195,13 @@ export const buildSheet = (columns, supplierName, supplierCode, titleText, DATA_
   };
 
   // B4, B5 — invoice inputs (UNLOCKED)
-  ws['B4'] = {
-    v: '', t: 's',
+
+   ws['B4'] = {
+    v: poNumber || '', t: 's',
     s: {
       protection: { locked: false, hidden: false },
-      font:       { color: { rgb: '000000' }, sz: 10 },
-      fill:       { fgColor: { rgb: 'FFFDE7' } },
+      font:       { color: { rgb: '880000' },italic: true, sz: 10 },
+      fill:       { fgColor: { rgb: 'FFEBEE' } },
     },
   };
   ws['B5'] = {
@@ -209,7 +212,14 @@ export const buildSheet = (columns, supplierName, supplierCode, titleText, DATA_
       fill:       { fgColor: { rgb: 'FFFDE7' } },
     },
   };
-
+  ws['B6'] = {
+    v: '', t: 's',
+    s: {
+      protection: { locked: false, hidden: false },
+      font:       { color: { rgb: '000000' }, sz: 10 },
+      fill:       { fgColor: { rgb: 'FFFDE7' } },
+    },
+  };
   // Hints (locked)
   ws['C2'] = {
     v: "(Don't change Supplier Name)", t: 's',
@@ -219,18 +229,18 @@ export const buildSheet = (columns, supplierName, supplierCode, titleText, DATA_
     v: "(Don't change Supplier Code)", t: 's',
     s: { protection: { locked: true, hidden: false }, font: { italic: true, color: { rgb: 'AAAAAA' }, sz: 8 } },
   };
-  ws['C5'] = {
-    v: '(Format: YYYY-MM-DD)', t: 's',
+  ws['C6'] = {
+    v: '(Format: YYYY/MM/DD)', t: 's',
     s: { protection: { locked: true, hidden: false }, font: { italic: true, color: { rgb: 'AAAAAA' }, sz: 8 } },
   };
 
   // ── Row 6: Spacer (locked) ────────────────────────────────────────────────
-  for (let c = 0; c < columns.length; c++) {
-    ws[`${colLetter(c)}6`] = {
-      v: '', t: 's',
-      s: { protection: { locked: true, hidden: false }, fill: { fgColor: { rgb: 'F5F5F5' } } },
-    };
-  }
+  // for (let c = 0; c < columns.length; c++) {
+  //   ws[`${colLetter(c)}7`] = {
+  //     v: '', t: 's',
+  //     s: { protection: { locked: true, hidden: false }, fill: { fgColor: { rgb: 'F5F5F5' } } },
+  //   };
+  // }
 
   // ── Row 7: Column headers (locked) ───────────────────────────────────────
   // Header color legend:
@@ -313,7 +323,7 @@ export const buildSheet = (columns, supplierName, supplierCode, titleText, DATA_
   ws['!ref']     = `A1:${colLetter(columns.length - 1)}${7 + DATA_ROWS}`;
   ws['!cols']    = columns.map(h => ({ wch: h.length > 15 ? 22 : 15 }));
   ws['!rows']    = [
-    { hpt: 30 }, { hpt: 18 }, { hpt: 18 }, { hpt: 18 }, { hpt: 18 }, { hpt: 6 }, { hpt: 42 },
+    { hpt: 30 }, { hpt: 18 }, { hpt: 18 }, { hpt: 18 }, { hpt: 20 }, { hpt: 20 }, { hpt: 42 },
   ];
 //   ws['!protect'] = makeProtect();
   return ws;
@@ -453,13 +463,13 @@ export const parseExcelDate = (value) => {
 
 
 // ─── Generate & download full workbook ────────────────────────────────────────
-export const generateWorkbook = (columns, supplierName, supplierCode, titleText, filename) => {
+export const generateWorkbook = (columns, supplierName, supplierCode, titleText, filename,poNumber) => {
   const wb = XLSX.utils.book_new();
 
   // Index 0 — main entry sheet
   XLSX.utils.book_append_sheet(
     wb,
-    buildSheet(columns, supplierName, supplierCode, titleText),
+    buildSheet(columns, supplierName, supplierCode, titleText,poNumber),
     'Purchase Entry'
   );
 
