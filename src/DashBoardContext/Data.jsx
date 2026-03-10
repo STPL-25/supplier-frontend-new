@@ -62,7 +62,8 @@ import {
   PurchaseReport,
   DebitCreditNotePage,
   SupPurchaseReport,
-  QCCheckReport
+  QCCheckReport,
+  DiamondQuotationForm 
 } from "../Components/ComponentRoutes";
 import { DiamondProvider } from "../Application/Diamond/DiamondGridContext/DiamondGridContext";
 import {
@@ -233,6 +234,7 @@ const sectionComponents = {
     //   </DiamondProvider>
     // ),
     "Credit Note And Debit Note": <DebitCreditNotePage />,
+    "Diamond Quotation Form": <DiamondQuotationForm />
 
   
 };

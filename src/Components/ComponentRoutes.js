@@ -27,6 +27,7 @@ import DebitCreditNotePage from "../Application/DebitNoteAndCreditNote/DebitCred
 // import SupPurchaseReport from "../Application/Diamond/FunctionalComponents/DiaSupPurchaseReport";
 import SupPurchaseReport from "../Application/DiamondPurEntry/components/SupReport";
 import QCCheckReport from "../Application/DiamondPurEntry/components/QCCheckReport";
+import DiamondQuotationForm from "../Application/DiamondQuotationMaster/Pages/DiamondQuotationForm";
 // ✅ Use these direct references instead
 const adminIcon = "/images/admin.png";
 const masterApprovalIcon = "/images/approval.png";
@@ -170,7 +171,8 @@ export {
   PurchaseReport,
   DebitCreditNotePage,
   SupPurchaseReport,
-  QCCheckReport
+  QCCheckReport,
+  DiamondQuotationForm
   // ChildPoTct
   // SupplierOrder
 };

@@ -1105,10 +1105,17 @@ console.log(suppCode)
             onSuccess={msg => setSaveStatus({ type: 'success', message: msg })}
           />
 
-          <TemplateUpload
+          {/* <TemplateUpload
             onDataLoaded={grouped => setData(grouped)}
             onReset={() => setData([])}
-          />
+          /> */}
+          <TemplateUpload
+  onDataLoaded={grouped => setData(grouped)}
+  onReset={() => setData([])}
+  selectedPO={selectedPO}
+  supplierName={poDetails?.supplierName || suppliers?.companyname || ''}
+  supplierCode={poDetails?.supplierCode || suppliers?.Suppcode || ''}
+/>
         </div>
       )}
 
