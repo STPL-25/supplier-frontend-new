@@ -90,6 +90,8 @@ import HallmarkInformation from "../Application/KYC/components/HallmarkInformati
 import POApproval from "../Application/Gold/pages/POApproval"
 import PoConsolidateReport from "../Application/Gold/pages/PoConsolidateReport";
 import RetailRates from "../Application/RetailRates/RetailRates";
+import DiamondQuotationApproval from "../Application/DiamondQuotationMaster/Pages/DiamondQuotationApproval";
+import PoRateFixing from "../Application/PoRateFixing/PoRateFixing";
 // import ChildPoTct from "../Application/Gold/components/ChildPoTct";
 export {
   DiamondMasterPage,
@@ -172,7 +174,9 @@ export {
   DebitCreditNotePage,
   SupPurchaseReport,
   QCCheckReport,
-  DiamondQuotationForm
+  DiamondQuotationForm,
+  DiamondQuotationApproval,
+  PoRateFixing
   // ChildPoTct
   // SupplierOrder
 };

@@ -48,6 +48,11 @@ const calculateTotals = (datas) => {
   return totals;
 };
 
+const formatWt = (val) =>
+  val && parseFloat(val) !== 0
+    ? parseFloat(val).toFixed(3)
+    : "-";
+
 const PurchaseOrderPreview = ({ datas, supplierDetails }) => {
   console.log(supplierDetails)
     console.log(datas)
@@ -219,13 +224,13 @@ const PurchaseOrderPreview = ({ datas, supplierDetails }) => {
                         {data.pieces || "-"}
                       </td>
                       <td className="p-3 text-sm text-gray-900">
-                        {data.gross_weight || "-"}
+                        {formatWt(data.gross_weight)}
                       </td>
                       <td className="p-3 text-sm text-gray-900">
-                        {data.net_weight || "-"}
+                        {formatWt(data.net_weight)}
                       </td>
                       <td className="p-3 text-sm text-gray-900">
-                        {data.pure_wt || "-"}
+                        {formatWt(data.pure_wt)}
                       </td>
                       <td className="p-3 text-sm text-gray-900">
                         {data.melting || "-"}%
@@ -281,19 +286,19 @@ const PurchaseOrderPreview = ({ datas, supplierDetails }) => {
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-green-600">
-                  {totals.totalGrossWeight}g
+                  {parseFloat(totals.totalGrossWeight).toFixed(3)}g
                 </p>
                 <p className="text-sm text-gray-600">Gross Weight</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-purple-600">
-                  {totals.totalNetWeight}g
+                  {parseFloat(totals.totalNetWeight).toFixed(3)}g
                 </p>
                 <p className="text-sm text-gray-600">Net Weight</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-orange-600">
-                  {totals.totalPureWeight ? `${totals.totalPureWeight}g` : "-"}
+                  {totals.totalPureWeight ? `${parseFloat(totals.totalPureWeight).toFixed(3)}g` : "-"}
                 </p>
                 <p className="text-sm text-gray-600">Pure Weight</p>
               </div>

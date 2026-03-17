@@ -1065,7 +1065,7 @@ const GoldProductForm = () => {
             : "Silver",
           productWeightage: "Gram",
           mc: "",
-          rate: "",
+          rate: formData.rate || "",
           fixRate: formData.fixRate || "",
           unfixRate: formData.unfixRate || "",
           goldwt: "",

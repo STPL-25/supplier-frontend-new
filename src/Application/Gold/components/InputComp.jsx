@@ -400,24 +400,66 @@ const CustomSelects = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  
-  // Filter options based on search term
+  const [dropdownStyle, setDropdownStyle] = useState({});
+  const triggerRef = useRef(null);
+  const dropdownRef = useRef(null);
+
   const filteredOptions = options.filter(option =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
+  const updateDropdownPosition = useCallback(() => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      updateDropdownPosition();
+      window.addEventListener('scroll', updateDropdownPosition, true);
+      window.addEventListener('resize', updateDropdownPosition);
+    }
+    return () => {
+      window.removeEventListener('scroll', updateDropdownPosition, true);
+      window.removeEventListener('resize', updateDropdownPosition);
+    };
+  }, [isOpen, updateDropdownPosition]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        triggerRef.current && !triggerRef.current.contains(e.target) &&
+        dropdownRef.current && !dropdownRef.current.contains(e.target)
+      ) {
+        setIsOpen(false);
+        setSearchTerm('');
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
   return (
     <div className="w-full mb-4">
       <label className="block text-sm font-semibold text-gray-800 mb-2">
         {label}
         {error && <span className="text-red-500 ml-1">*</span>}
       </label>
-      
-      {/* Selected value display */}
-      <div className="relative">
+
+      <div className="relative" ref={triggerRef}>
         <div
           className={`
-            w-full px-4 py-3 bg-white border-2 rounded-xl 
+            w-full px-4 py-3 bg-white border-2 rounded-xl
             text-sm transition duration-300 ease-in-out
             focus:outline-none
             ${
@@ -441,27 +483,24 @@ const CustomSelects = ({
           </svg>
         </div>
       </div>
-      
-      {/* Error message */}
+
       {error && (
         <p className="mt-1 text-xs text-red-500 pl-1 animate-pulse">{error}</p>
       )}
-      
+
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-30 bg-white shadow-lg rounded-xl border border-gray-200">
-          {/* Search input */}
+        <div ref={dropdownRef} style={dropdownStyle} className="bg-white shadow-lg rounded-xl border border-gray-200">
           <div className="p-2 border-b border-gray-200">
             <input
               type="text"
-              className="w-30 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onClick={(e) => e.stopPropagation()}
+              autoFocus
             />
           </div>
-          
-          {/* Options list */}
           <div className="max-h-60 overflow-auto">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (

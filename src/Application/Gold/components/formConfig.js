@@ -226,9 +226,12 @@ export const getFormFields = (
         type: 'radio',
         required: true,
         options: [
-          { name: 'paymentType', value: 'RSB', label: 'RTGS' },{ name: 'paymentType', value: 'IV', label: 'Issue Voucher' },
+          { name: 'paymentType', value: 'RSB', label: 'RTGS' },
           ...(formData?.from?.poPreFix !== 'TCT'
-            ? [{ name: 'paymentType', value: 'MSB', label: 'MSB' }]
+            ? [
+                { name: 'paymentType', value: 'IV', label: 'Issue Voucher' },
+                { name: 'paymentType', value: 'MSB', label: 'MSB' },
+              ]
             : []),
           ...(formData?.from?.poPreFix === 'TCT' && orderType !== 'unfix'
             ? [{ name: 'paymentType', value: 'IV', label: 'Issue Voucher' }]
