@@ -123,8 +123,13 @@ function PoRateFixing() {
     );
     const totalAmount = itemsForPo.reduce((sum, item) => sum + calcAmount(item), 0);
     const type = itemsForPo[0]?.type || "";
+    const firstItem = itemsForPo[0];
+    const poDate = firstItem
+      ? parsePoDetails(firstItem).poDate || firstItem.poDate || ""
+      : "";
     return {
       poNumber,
+      poDate,
       rate,
       totalQty,
       totalAmount,

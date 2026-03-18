@@ -151,7 +151,7 @@ table td{
 table{
     width: 100%;
     height: auto;
-    margin-left: 20px;
+    margin-left: 0;
     font-size: 15px;
     box-shadow: none !important;
     --tw-shadow:unset;
