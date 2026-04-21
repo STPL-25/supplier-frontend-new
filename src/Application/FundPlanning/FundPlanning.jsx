@@ -16,7 +16,7 @@ function FundPlanning() {
         setError(null);
         
         const response = await axios.get(`${API}/summary_report/daily-fund-transfer-summary`);
-        console.log('API Response:', response.data);
+        // console.log('API Response:', response.data);
         
         // Handle different response structures
         const responseData = Array.isArray(response.data) 
@@ -25,7 +25,7 @@ function FundPlanning() {
         
         setData(responseData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
         setError(error.message || 'Failed to fetch data');
       } finally {
         setLoading(false);
@@ -36,7 +36,7 @@ function FundPlanning() {
   }, []);
 
   const handleDataChange = (updatedData) => {
-    console.log('Data changed:', updatedData);
+    // console.log('Data changed:', updatedData);
     setData(updatedData);
   };
 

@@ -1506,7 +1506,7 @@ const KYCReport = () => {
         setError(null);
       } catch (err) {
         setError(err.message || "Failed to fetch KYC data");
-        console.error("Error fetching KYC data:", err);
+        // console.error("Error fetching KYC data:", err);
       } finally {
         setLoading(false);
       }

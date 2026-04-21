@@ -209,7 +209,7 @@ const PurchaseOrderDialog = ({
           }));
         }
       } catch (error) {
-        console.error("Error fetching supplier details:", error);
+        // console.error("Error fetching supplier details:", error);
       }
     };
     fetchSupplierdetails();
@@ -246,7 +246,7 @@ const PurchaseOrderDialog = ({
           }));
         }
       } catch (error) {
-        console.error("Error fetching PO number:", error);
+        // console.error("Error fetching PO number:", error);
       }
     };
 
@@ -428,7 +428,7 @@ const PurchaseOrderDialog = ({
     // Group address fields for step 2
     const addressFields = currentFields?.filter(f => f.wrapper === 'address') || [];
     const regularFields = currentFields?.filter(f => !f.wrapper) || [];
-console.log(formData)
+// console.log(formData)
     return (
       <div className="space-y-6">
         {currentStep === 1 && (

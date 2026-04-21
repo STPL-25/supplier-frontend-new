@@ -22,7 +22,7 @@ export const secureUtils = {
       const jsonStr = typeof data === 'object' ? JSON.stringify(data) : String(data);
       return CryptoJS.AES.encrypt(jsonStr, SESSION_ENCRYPTION_KEY).toString();
     } catch (err) {
-      console.error('Encryption error:', err);
+      // console.error('Encryption error:', err);
       return null;
     }
   },
@@ -43,7 +43,7 @@ export const secureUtils = {
       }
       return decryptedStr;
     } catch (err) {
-      console.error('Decryption error:', err);
+      // console.error('Decryption error:', err);
       return null;
     }
   },
@@ -62,7 +62,7 @@ export const secureUtils = {
       // Return processed result
       return result;
     } catch (err) {
-      console.error('Secure processing error:', err);
+      // console.error('Secure processing error:', err);
       return null;
     }
   },
@@ -155,7 +155,7 @@ export const withSecureApi = (WrappedComponent) => {
           decrypt: () => secureUtils.decrypt(encryptedData)
         };
       } catch (error) {
-        console.error('Secure fetch error:', error);
+        // console.error('Secure fetch error:', error);
         throw error;
       }
     };

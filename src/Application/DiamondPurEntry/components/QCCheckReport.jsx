@@ -1273,14 +1273,14 @@ const fetchQCDefects = async () => {
     const parsed = JSON.parse(jsonString);
     setDefectGroups(parsed?.QCDefects || []);
   } catch (err) {
-    console.error('Failed to fetch QC defects:', err);
+    // console.error('Failed to fetch QC defects:', err);
     setDefectGroups([]);
   } finally {
     setDefectsLoading(false);
   }
 };
 
-  console.log(defectGroups)
+  // console.log(defectGroups)
 
   useEffect(() => { fetchQCDefects(); }, []);
 
@@ -1333,7 +1333,7 @@ const fetchQCDefects = async () => {
         return next;
       });
     } catch (err) {
-      console.error('Fetch error:', err);
+      // console.error('Fetch error:', err);
       setPurchaseData([]);
       setFilteredData([]);
     } finally {
@@ -1529,13 +1529,13 @@ const fetchQCDefects = async () => {
       }));
 
       const response = await axios.post(`${DIA_API}/saveQCCheck`, { items: payload });
-      console.log(response);
+      // console.log(response);
 
       setQcData((prev) => ({ ...prev, ...updates }));
       setSelectedIds(new Set());
       closeQCModal();
     } catch (err) {
-      console.error('QC save error:', err);
+      // console.error('QC save error:', err);
       alert('Failed to save QC. Try again.');
     } finally {
       setSubmitting(false);

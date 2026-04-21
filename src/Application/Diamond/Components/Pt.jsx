@@ -5,10 +5,10 @@ function Pt() {
   const { inputFields,  handleInputChange,handleSubmit,errors,validateFields} = useContext(DiamondContext);
   const handleChange = (e) => {
     handleInputChange(e); 
-    console.log(e)
+    // console.log(e)
     
     const objectString = JSON.stringify(inputFields);
-    console.log(objectString);
+    // console.log(objectString);
       };
 
     

@@ -1,6 +1,6 @@
 const validate = (kycFormData, filesDatas, fileDatasUrl) => {
     let tempErrors = {};
-    console.log(kycFormData)
+    // console.log(kycFormData)
     // Supplier Category
     if (!kycFormData.supplierCategory) {
         tempErrors.supplierCategory = "Supplier Category is required.";

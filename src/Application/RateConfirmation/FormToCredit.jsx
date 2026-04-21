@@ -1132,7 +1132,7 @@ function FormToCredit() {
       try {
         const response = await axios.post(`${API}/get_bill_details`, { inv_no: formData.Billno });
         const results = response.data.result[0];
-        console.log(results);
+        // console.log(results);
 
         if (results && results.length > 0) {
           const billData = results[0];
@@ -1184,7 +1184,7 @@ function FormToCredit() {
           }));
         }
       } catch (error) {
-        console.error("Error fetching pending suppliers:", error);
+        // console.error("Error fetching pending suppliers:", error);
         showError("Failed to load bill details");
       }
     };
@@ -1229,7 +1229,7 @@ function FormToCredit() {
         config,
         (decodedText, decodedResult) => {
           // QR Code successfully scanned
-          console.log("QR Code scanned:", decodedText);
+          // console.log("QR Code scanned:", decodedText);
           
           setFormData(prev => ({
             ...prev,
@@ -1252,7 +1252,7 @@ function FormToCredit() {
       );
 
     } catch (err) {
-      console.error("Unable to start scanner:", err);
+      // console.error("Unable to start scanner:", err);
       showError(err.message || "Failed to start camera. Please check permissions.");
       setIsScanning(false);
     }
@@ -1266,7 +1266,7 @@ function FormToCredit() {
         html5QrCodeRef.current = null;
       }
     } catch (err) {
-      console.error("Error stopping scanner:", err);
+      // console.error("Error stopping scanner:", err);
     } finally {
       setIsScanning(false);
     }
@@ -1346,7 +1346,7 @@ function FormToCredit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
-    console.log(formData);
+    // console.log(formData);
 
     try {
       const formDataToSend = new FormData();
@@ -1406,13 +1406,13 @@ function FormToCredit() {
           orderTypes,
           poType.trim()
         );
-        console.log(pdfGenerated);
+        // console.log(pdfGenerated);
         showSuccess("Data Saved Successfully");
       } else {
         res = await axios.post(`${API}/datapost`, formDataToSend);
         showSuccess("Data Saved Successfully");
       }
-      console.log(res.data);
+      // console.log(res.data);
 
       if (res.status === 200) {
         handleCancel(e);

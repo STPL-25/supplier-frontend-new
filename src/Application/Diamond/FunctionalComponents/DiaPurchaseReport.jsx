@@ -46,7 +46,7 @@ const PurchaseReport = () => {
       if (!stonesString || stonesString === '[]') return [];
       return JSON.parse(stonesString);
     } catch (error) {
-      console.error('Error parsing stones:', error);
+      // console.error('Error parsing stones:', error);
       return [];
     }
   };
@@ -135,11 +135,11 @@ const PurchaseReport = () => {
     try {
       const response = await axios.get(`${DIA_API}/getPurchaseEntries`);
       const data = response.data.result[0] || [];
-      console.log('Fetched purchase entries:', data);
+      // console.log('Fetched purchase entries:', data);
       setPurchaseData(data);
       setFilteredData(data);
     } catch (error) {
-      console.error('Error fetching purchase entries:', error);
+      // console.error('Error fetching purchase entries:', error);
       setPurchaseData([]);
       setFilteredData([]);
     } finally {

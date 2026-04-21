@@ -378,7 +378,7 @@ function GoldPoCreation() {
         );
         setSuppliers(response.data.supplierNames);
       } catch (error) {
-        console.error("Error fetching supplier and PO details:", error);
+        // console.error("Error fetching supplier and PO details:", error);
         showSnackbar("Failed to fetch suppliers", "error");
       }
     };
@@ -395,7 +395,7 @@ function GoldPoCreation() {
         setPoNumbers(response.data.filteredData.poNumbers);
         setPoDwlStatus(response.data.poStatusData);
       } catch (error) {
-        console.error("Error fetching supplier and PO details:", error);
+        // console.error("Error fetching supplier and PO details:", error);
         showSnackbar("Failed to fetch PO numbers", "error");
       }
     };
@@ -455,7 +455,7 @@ function GoldPoCreation() {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error fetching PO creation details:", error);
+      // console.error("Error fetching PO creation details:", error);
       showSnackbar("No Data Found", "error");
       setError(error.message);
       setFilteredData([]);

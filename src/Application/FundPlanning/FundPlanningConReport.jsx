@@ -54,7 +54,7 @@ function FundPlanningConReport() {
           setFilteredData([responseData[0]]);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
         setError(error.message || 'Failed to fetch data');
       } finally {
         setLoading(false);
@@ -138,7 +138,7 @@ useEffect(() => {
     });
   }
 };
- console.log(dateRange);
+ // console.log(dateRange);
 
   const applyFilters = () => {
     setIsFilterDialogOpen(false);

@@ -123,7 +123,7 @@ function SignUp() {
       if (errors[name]) setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
     }
   };
-console.log(signup)
+// console.log(signup)
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};

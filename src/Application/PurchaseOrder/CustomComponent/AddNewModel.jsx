@@ -49,7 +49,7 @@ const AddNewModal = ({
       await onSave(formData, master);
       onClose();
     } catch (error) {
-      console.error("Error saving data:", error);
+      // console.error("Error saving data:", error);
     }
   };
 

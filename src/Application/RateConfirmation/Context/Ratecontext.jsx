@@ -24,12 +24,12 @@ const RateProvider = ({ children }) => {
         if (tokens) {
           const Securedtoken = decryptToken(tokens);
           const decodedToken = jwtDecode(Securedtoken);
-          console.log(decodedToken)
+          // console.log(decodedToken)
           const role = decodedToken.role
           const name = decodedToken.name
           const companyName = decodedToken.companyName
           const setSignCatagorys = decodedToken.signUpCatagory
-          console.log(setSignCatagorys === "Supplier")
+          // console.log(setSignCatagorys === "Supplier")
           setUserRole(role);
           setNames(name)
           setCompanyName(setSignCatagorys === "Supplier" ? companyName : "")

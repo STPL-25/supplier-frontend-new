@@ -31,7 +31,7 @@ const sktmpng=  "/images/sktm.png"
         const response = await axios.get(`${API}/rate/supplierName`);
         setSupName(response.data);
       } catch (error) {
-        console.error("Error fetching supplier names:", error);
+        // console.error("Error fetching supplier names:", error);
       }
     };
 
@@ -49,7 +49,7 @@ const sktmpng=  "/images/sktm.png"
       handleError(error);
     }
   };
-console.log(datas)
+// console.log(datas)
   // Error handling helper
   const handleError = (error) => {
     const errorMessage = error.response?.data?.message ||
@@ -67,7 +67,7 @@ console.log(datas)
       setSelectedBillDetails(response.data[0]);
       setOpenDetailsDialog(true);
     } catch (error) {
-      console.error("Error fetching bill details:", error);
+      // console.error("Error fetching bill details:", error);
       setErrors({ message: "Failed to load bill details" });
     } finally {
       setLoadingDetails(false);
@@ -76,7 +76,7 @@ console.log(datas)
 
   const handlePrint = (billDetails) => {
     // Create print content
-    console.log(billDetails)
+    // console.log(billDetails)
    const printContent = `
   <html>
     <head>

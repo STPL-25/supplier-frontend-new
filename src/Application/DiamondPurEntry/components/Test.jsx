@@ -747,7 +747,7 @@ const DiamondManager = () => {
     setPoError(null);
     const response =await axios.get(`${API}/gold_po/fetch_po_number/${user}/Diamond-Supplier/Accepted`)
     
-    console.log("response",response);
+    // console.log("response",response);
     if (response.data && response?.data?.filteredData && response?.data?.filteredData?.poNumbers) {
       setPoNumbers(response?.data?.filteredData?.poNumbers);
     } else {
@@ -757,7 +757,7 @@ const DiamondManager = () => {
   };
   fetchPONumbers();
   }, []);
-console.log(poNumbers)
+// console.log(poNumbers)
   // ── Handle PO selection: find details from the fetched list ──
   // If your API returns full objects (not just strings), store them and look up on select.
   // Otherwise you can make a secondary API call here for details.
@@ -790,7 +790,7 @@ console.log(poNumbers)
       });
       setPoDetails(matched && typeof matched !== 'string' ? matched : { PONumber: poNumber });
     } catch (err) {
-      console.error('PO detail fetch error:', err);
+      // console.error('PO detail fetch error:', err);
       setPoDetails({ PONumber: poNumber });
     }
   };

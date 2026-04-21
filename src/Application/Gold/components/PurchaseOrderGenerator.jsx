@@ -94,7 +94,7 @@ const POPage = ({
   pdfType,
 }) => {
   const columns = getColumns(data);
-  console.log("data", data);
+  // console.log("data", data);
   const phoneNumber =
     data[0].metal_type === "Gold"
       ? "+91 9629570888, +91 9789680888"
@@ -113,6 +113,8 @@ const POPage = ({
   const approvedTime = data[0].poApprovedDate;
   const parsedMoment = moment(approvedTime);
   const type=data[0].type;
+  const rate=data[0].rate;
+  const rateTypeLabel = type === "fix" ? "Fixed Rate" : type === "unfix" ? "Unfixed Rate" : type || "-";
   const dateOnly = parsedMoment.format("YYYY-MM-DD");
   const timeOnly = parsedMoment.format("HH:mm:ss");
 
@@ -305,6 +307,15 @@ const POPage = ({
             })()}
           </View>
         </View>
+      </View>
+
+      {/* Rate Type Info */}
+      <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#eff6ff", borderRadius: 4, padding: 6, marginBottom: 4 }}>
+        <Text style={{ fontSize: 9, fontWeight: "bold", color: "#1e40af" }}>Rate Type: </Text>
+        <Text style={{ fontSize: 9, color: "#1e3a8a" }}>{rateTypeLabel}</Text>
+        <Text style={{ fontSize: 9, fontWeight: "bold", color: "#1e40af" }}>{"   "}Rate: </Text>
+        <Text style={{ fontSize: 9, color: "#1e3a8a" }}>{rate || "-"}</Text>
+        <Text style={{ fontSize: 8, color: "#6b7280" }}>{"   "}(Pure Rate with GST)</Text>
       </View>
 
       <View style={styles.table}>
@@ -547,7 +558,7 @@ const PurchaseOrderGenerator = ({
       </div>
     );
   }
-  console.log(submittedData, poAddressData, pdfType);
+  // console.log(submittedData, poAddressData, pdfType);
   return (
     <div className="w-full flex justify-center p-4">
       {console.log(submittedData, poAddressData,pdfType)}

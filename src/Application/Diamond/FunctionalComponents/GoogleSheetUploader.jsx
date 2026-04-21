@@ -84,11 +84,11 @@ const GoogleSheetsPurchaseManager = () => {
               });
               if (isMounted) {
                 setGapiInited(true);
-                console.log('GAPI initialized successfully');
+                // console.log('GAPI initialized successfully');
               }
               resolve();
             } catch (error) {
-              console.error('Error initializing GAPI:', error);
+              // console.error('Error initializing GAPI:', error);
               if (isMounted) {
                 setStatus({ type: 'error', message: 'Failed to initialize Google API' });
               }
@@ -97,7 +97,7 @@ const GoogleSheetsPurchaseManager = () => {
           });
         });
       } catch (error) {
-        console.error('Error loading GAPI script:', error);
+        // console.error('Error loading GAPI script:', error);
         if (isMounted) {
           setStatus({ type: 'error', message: 'Failed to load Google API script' });
         }
@@ -117,7 +117,7 @@ const GoogleSheetsPurchaseManager = () => {
           scope: SCOPES,
           callback: (response) => {
             if (response.error !== undefined) {
-              console.error('Authorization error:', response.error);
+              // console.error('Authorization error:', response.error);
               setStatus({ type: 'error', message: `Authorization failed: ${response.error}` });
               setIsAuthorized(false);
               return;
@@ -131,10 +131,10 @@ const GoogleSheetsPurchaseManager = () => {
         if (isMounted) {
           setTokenClient(client);
           setGisInited(true);
-          console.log('GIS initialized successfully');
+          // console.log('GIS initialized successfully');
         }
       } catch (error) {
-        console.error('Error initializing GIS:', error);
+        // console.error('Error initializing GIS:', error);
         if (isMounted) {
           setStatus({ type: 'error', message: 'Failed to initialize Google Identity Services' });
         }
@@ -146,7 +146,7 @@ const GoogleSheetsPurchaseManager = () => {
       try {
         await Promise.all([initializeGapi(), initializeGis()]);
       } catch (error) {
-        console.error('API initialization failed:', error);
+        // console.error('API initialization failed:', error);
         if (isMounted) {
           setStatus({ 
             type: 'error', 
@@ -183,7 +183,7 @@ const GoogleSheetsPurchaseManager = () => {
         tokenClient.requestAccessToken({ prompt: '' });
       }
     } catch (error) {
-      console.error('Authorization error:', error);
+      // console.error('Authorization error:', error);
       setStatus({ type: 'error', message: 'Authorization failed. Please try again.' });
     }
   };
@@ -194,7 +194,7 @@ const GoogleSheetsPurchaseManager = () => {
       const token = window.gapi.client.getToken();
       if (token !== null) {
         window.google.accounts.oauth2.revoke(token.access_token, () => {
-          console.log('Token revoked');
+          // console.log('Token revoked');
         });
         window.gapi.client.setToken('');
       }
@@ -206,7 +206,7 @@ const GoogleSheetsPurchaseManager = () => {
       setMasters({});
       setStatus({ type: 'success', message: 'Signed out successfully' });
     } catch (error) {
-      console.error('Sign out error:', error);
+      // console.error('Sign out error:', error);
       setStatus({ type: 'error', message: 'Sign out failed' });
     }
   };
@@ -233,7 +233,7 @@ const GoogleSheetsPurchaseManager = () => {
         message: `Loaded ${mappedSuppliers.length} suppliers` 
       });
     } catch (error) {
-      console.error('Error fetching suppliers:', error);
+      // console.error('Error fetching suppliers:', error);
       setStatus({ 
         type: 'error', 
         message: `Error fetching suppliers: ${error.response?.data?.message || error.message}` 
@@ -269,7 +269,7 @@ const GoogleSheetsPurchaseManager = () => {
       const newSpreadsheetId = createResponse.result.spreadsheetId;
       const spreadsheetUrl = `https://docs.google.com/spreadsheets/d/${newSpreadsheetId}/edit`;
 
-      console.log('Spreadsheet created:', newSpreadsheetId);
+      // console.log('Spreadsheet created:', newSpreadsheetId);
 
       await formatSupplierSheet(newSpreadsheetId, supplierCode, supplierName);
 
@@ -282,7 +282,7 @@ const GoogleSheetsPurchaseManager = () => {
           }
         );
       } catch (backendError) {
-        console.error('Backend update error:', backendError);
+        // console.error('Backend update error:', backendError);
         setStatus({ 
           type: 'warning', 
           message: 'Sheet created but failed to save to database. Please contact admin.' 
@@ -298,7 +298,7 @@ const GoogleSheetsPurchaseManager = () => {
 
       return newSpreadsheetId;
     } catch (error) {
-      console.error('Error creating sheet:', error);
+      // console.error('Error creating sheet:', error);
       setStatus({ 
         type: 'error', 
         message: `Error creating sheet: ${error.result?.error?.message || error.message}` 
@@ -443,9 +443,9 @@ const GoogleSheetsPurchaseManager = () => {
         resource: { requests: formatRequests },
       });
 
-      console.log('Sheet formatted successfully');
+      // console.log('Sheet formatted successfully');
     } catch (error) {
-      console.error('Error formatting sheet:', error);
+      // console.error('Error formatting sheet:', error);
       throw new Error(`Formatting failed: ${error.result?.error?.message || error.message}`);
     }
   };
@@ -595,7 +595,7 @@ const GoogleSheetsPurchaseManager = () => {
         message: `Loaded ${entries.length} entries from ${selectedSupplier?.name}'s sheet` 
       });
     } catch (error) {
-      console.error('Error fetching sheet data:', error);
+      // console.error('Error fetching sheet data:', error);
       
       if (error.status === 401) {
         setIsAuthorized(false);
@@ -668,7 +668,7 @@ const GoogleSheetsPurchaseManager = () => {
 
       return { diamonds, colorStones };
     } catch (error) {
-      console.error('Error fetching details:', error);
+      // console.error('Error fetching details:', error);
       return { diamonds: [], colorStones: [] };
     }
   };
@@ -733,7 +733,7 @@ const GoogleSheetsPurchaseManager = () => {
         message: `Successfully saved ${entriesWithDetails.length} entries for ${selectedSupplier.name} to database` 
       });
     } catch (error) {
-      console.error('Save error:', error);
+      // console.error('Save error:', error);
       setStatus({ 
         type: 'error', 
         message: `Save failed: ${error.response?.data?.message || error.message}` 

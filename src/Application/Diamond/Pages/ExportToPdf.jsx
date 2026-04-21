@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
 });
 
 const DiamondPDF = ({ data }) => {
-  console.log(data)
+  // console.log(data)
   
   const formatNumber = (value) => {
     if (!value) return '0.00';
@@ -286,7 +286,7 @@ const DiamondPDF = ({ data }) => {
   );
 
   const totals = calculateTotals();
-  console.log(totals);
+  // console.log(totals);
   
   return (
     <Document>

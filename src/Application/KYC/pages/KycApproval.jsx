@@ -37,7 +37,7 @@ function KycApproval() {
   const { KYC_API, userRole, approvedData, setApprovedData, API } =
     useContext(KycContext);
   const { user } = useContext(DashBoardContext);
-  console.log("user", user);
+  // console.log("user", user);
   
   const [supplierDetails, setSupplierDetails] = useState(() => {
     const saved = localStorage.getItem("supplier");
@@ -88,21 +88,21 @@ function KycApproval() {
   }, [supplierDetails]);
 
   const fetchKycData = async () => {
-    console.log(supplierDetails, userRole);
+    // console.log(supplierDetails, userRole);
     try {
       if (supplierDetails && userRole) {
         const encodedUserRole = btoa(userRole);
         const response = await axios.get(
           `${KYC_API}/gettingkycdetails/${supplierDetails}/${encodedUserRole}`
         );
-        console.log(response.data);
+        // console.log(response.data);
         setDatas(response.data);
         if (response.data.length > 0) {
           setSupplierId(response.data[0].id);
         }
       }
     } catch (error) {
-      console.error("Error fetching KYC data:", error);
+      // console.error("Error fetching KYC data:", error);
     }
   };
 
@@ -122,7 +122,7 @@ function KycApproval() {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching supplier names:", error);
+      // console.error("Error fetching supplier names:", error);
       throw new Error("Failed to fetch supplier names.");
     }
   };
@@ -136,7 +136,7 @@ function KycApproval() {
     queryKey: ["supplierNames"],
     queryFn: () => fetchSupplierNames(userRole),
     onError: (error) => {
-      console.error("Error in useQuery:", error.message);
+      // console.error("Error in useQuery:", error.message);
       setErrorMsg(error.message);
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -248,7 +248,7 @@ function KycApproval() {
 
   const handleVerify = async (action) => {
     try {
-      console.log(supplierId, action);
+      // console.log(supplierId, action);
       setIsVerified(true);
       setIsRejected(false);
       const response = await axios.put(
@@ -260,7 +260,7 @@ function KycApproval() {
         setOpenSnackbar(true);
         if (action === "Approve") {
           const res = await axios.get(`${KYC_API}/approved/sms/${supplierId}`);
-          console.log(res.data);
+          // console.log(res.data);
         }
         setSupplierDetails("");
         setDatas([]);
@@ -280,9 +280,9 @@ function KycApproval() {
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
-      console.log(response.data);
+      // console.log(response.data);
     } catch (error) {
-      console.error(`Error during ${action}:`, error);
+      // console.error(`Error during ${action}:`, error);
       setErrorMsg(`Failed to ${action.toLowerCase()} KYC data.`);
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -299,9 +299,9 @@ function KycApproval() {
 
   const handleReject = async () => {
     try {
-      console.log(userRole);
+      // console.log(userRole);
       const encodedUserRole = btoa(userRole);
-      console.log(encodedUserRole);
+      // console.log(encodedUserRole);
 
       const response = await axios.put(
         `${KYC_API}/kycdatachecking/${supplierId}/Reject/${user}`,
@@ -309,7 +309,7 @@ function KycApproval() {
       );
       if (response.status === 200) {
         const res = await axios.get(`${KYC_API}/rejected/sms/${supplierId}`);
-        console.log(res.data);
+        // console.log(res.data);
         setSuccessMsg("Rejected successfully.");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
@@ -330,7 +330,7 @@ function KycApproval() {
         await refetchSupplierNames();
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setErrorMsg("Failed to reject KYC.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);

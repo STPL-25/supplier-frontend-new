@@ -64,7 +64,7 @@ function BankingInformation() {
             setActiveComponent("Contact Information");
             localStorage.setItem("KycAcc", JSON.stringify(accInfo));
         } else {
-            console.log("Form has errors. Cannot proceed to next section.");
+            // console.log("Form has errors. Cannot proceed to next section.");
         }
     };
 
@@ -72,7 +72,7 @@ function BankingInformation() {
         const fetchBankdetails = async () => {
             try {
                 const response = await axios.get(`https://ifsc.razorpay.com/${accInfo.ifsc}`);
-                console.log(response.data);
+                // console.log(response.data);
                 setAccInfo((prevValue) => ({
                     ...prevValue,
                     bankname: response.data.BANK,
@@ -84,7 +84,7 @@ function BankingInformation() {
                     return rest;
                 });
             } catch (error) {
-                console.log(error);
+                // console.log(error);
                 setAccInfo((prevValue) => ({
                     ...prevValue,
                     bankname: "",

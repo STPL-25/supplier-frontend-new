@@ -146,7 +146,7 @@ const SupplierReport = () => {
         const { supplierNames } = response.data;
         setQueryOptions(supplierNames);
       } catch (err) {
-        console.error("Error fetching options:", err);
+        // console.error("Error fetching options:", err);
         setError(err);
       } finally {
         setIsLoading(false);
@@ -172,7 +172,7 @@ const SupplierReport = () => {
         setInvoiceOptions(uniqueInvoices.sort());
         
       } catch (err) {
-        console.error("Error fetching data:", err);
+        // console.error("Error fetching data:", err);
         setError(err);
       } finally {
         setIsLoading(false);
@@ -198,7 +198,7 @@ const SupplierReport = () => {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Export failed:', error);
+      // console.error('Export failed:', error);
     }
   };
 

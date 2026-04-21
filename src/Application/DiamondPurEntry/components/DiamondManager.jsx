@@ -917,7 +917,7 @@ const POSelectorPanel = ({
 
 const DiamondManager = () => {
   const { user,suppCode } = useContext(DashBoardContext);
-console.log(suppCode)
+// console.log(suppCode)
   const [suppliers,        setSuppliers]        = useState({});
   const [data,             setData]             = useState([]);
   const [saving,           setSaving]           = useState(false);
@@ -958,7 +958,7 @@ console.log(suppCode)
           setPoError('Unexpected API response structure.');
         }
       } catch (err) {
-        console.error('PO fetch error:', err);
+        // console.error('PO fetch error:', err);
         setPoError('Failed to load PO numbers.');
       } finally {
         setPoLoading(false);
@@ -1020,7 +1020,7 @@ console.log(suppCode)
         productAvlTypes,                               // { Gold: true, Diamond: true, Platinum: false }
       });
     } catch (err) {
-      console.error('PO detail fetch error:', err);
+      // console.error('PO detail fetch error:', err);
       setPoError('Failed to load PO details.');
       // Fallback: at least show PO number
       setPoDetails({ poNumber });

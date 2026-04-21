@@ -56,7 +56,7 @@ function TradeInformation() {
             ...hallmarkValidationErrors,
         };
     
-        console.log(combinedErrors);
+        // console.log(combinedErrors);
         setErrors(combinedErrors);
     
         return Object.keys(combinedErrors).length === 0;
@@ -69,7 +69,7 @@ function TradeInformation() {
             localStorage.setItem("KycTrade", JSON.stringify(tradeBusinessInfo));
 
             const result = await handleSubmit();
-            console.log(result);
+            // console.log(result);
             if (result.success) {
                 toast.success("KYC Data's submitted successfully!");
             } else {

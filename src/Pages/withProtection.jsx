@@ -8,7 +8,7 @@ const withProtection = (Component) => {
   
         // Disable shortcuts
         const disableShortcuts = (event) => {
-            console.log(event)
+            // console.log(event)
           if (
             event.key === "F12" || 
             (event.ctrlKey && event.shiftKey && event.key === "I") ||

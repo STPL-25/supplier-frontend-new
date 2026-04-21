@@ -257,7 +257,7 @@ const QRCodeComponent = ({ value }) => {
         });
         setQrDataURL(url);
       } catch (err) {
-        console.error("Error generating QR code:", err);
+        // console.error("Error generating QR code:", err);
       }
     };
 
@@ -768,7 +768,7 @@ const POPage = ({
                   ? JSON.parse(poAddressData?.delivery)
                   : null;
               } catch (error) {
-                console.error("Error parsing delivery data:", error);
+                // console.error("Error parsing delivery data:", error);
               }
 
               return (

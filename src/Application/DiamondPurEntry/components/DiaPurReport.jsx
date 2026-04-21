@@ -153,7 +153,7 @@ const PurchaseReport = () => {
       const data = response.data.result[0] || [];
       setPurchaseData(data);
     } catch (error) {
-      console.error('Error fetching purchase entries:', error);
+      // console.error('Error fetching purchase entries:', error);
       setPurchaseData([]);
     } finally {
       setLoading(false);
@@ -328,7 +328,7 @@ const PurchaseReport = () => {
       saveAs(blob, fileName);
 
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      // console.error('Error generating PDF:', error);
       alert('Failed to generate PDF');
     } finally {
       setPdfGenerating(false);

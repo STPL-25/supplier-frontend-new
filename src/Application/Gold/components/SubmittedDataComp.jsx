@@ -1301,7 +1301,7 @@ function SubmittedDataComp({
     try {
       return typeof poDetails === "string" ? JSON.parse(poDetails) : poDetails;
     } catch (error) {
-      console.error("Error parsing poDetails:", error);
+      // console.error("Error parsing poDetails:", error);
       return null;
     }
   };
@@ -1317,13 +1317,13 @@ function SubmittedDataComp({
 
   const { generatePdf, isGenerating, errors } = useSendToServer({
     onPdfGenerated: (pdfFile) => {
-      console.log("PDF generated successfully");
+      // console.log("PDF generated successfully");
     },
   });
 
   const { generatePdf: generateTctPdf } = useTctSendToServer({
     onPdfGenerated: (pdfFile) => {
-      console.log("PDF generated successfully");
+      // console.log("PDF generated successfully");
     },
   });
 
@@ -1386,14 +1386,17 @@ function SubmittedDataComp({
         const orderTypes = response.data.orderTypes;
         const poType = response.data.poType;
         const poNumber = response.data.poNumber;
-        if (!poNumber?.includes("TCT")) {
+        if (
+          poType?.trim().toLowerCase() === "unfix" &&
+          !poNumber?.includes("TCT")
+        ) {
           await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
         }
         if (response.status === 200) {
           fetchPoCreationDetails();
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
 
@@ -1406,7 +1409,7 @@ function SubmittedDataComp({
           fetchPoCreationDetails();
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
 
@@ -1606,15 +1609,18 @@ function SubmittedDataComp({
         const poData = response.data.poData;
         const orderTypes = response.data.orderTypes;
         const poType = response.data.poType;
-        console.log("11111111111111", poData);
-        if (!filteredItems[0].poNumber.includes("TCT")) {
+        const poNumber = response.data.poNumber;
+        if (
+          poType?.trim().toLowerCase() === "unfix" &&
+          !poNumber?.includes("TCT")
+        ) {
           await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
         }
         if (response.status === 200) {
           fetchPoCreationDetails();
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
 
@@ -1627,7 +1633,7 @@ function SubmittedDataComp({
           fetchPoCreationDetails();
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
 

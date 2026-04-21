@@ -20,7 +20,7 @@ const SearchBar = () => {
   const [rejectId,setRejectId]=useState('')
    const [errors,setErrors]=useState(false)
   const { user,userRole,mobileNo,companyName,names ,signCatagory } = useContext(RateContext);
-console.log(API)
+// console.log(API)
   // Search handler
   const handleSearch = useCallback(async () => {
     if (!mobileNo) return;
@@ -31,7 +31,7 @@ console.log(API)
       setDatas(response.data);
       setCurrentPage(0);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -62,7 +62,7 @@ console.log(API)
   // Accept/Reject handlers
   const handleAccept = async (supplierId, img) => {
     try {
-      console.log(supplierId, img)
+      // console.log(supplierId, img)
             
               const response=  await axios.put(
                 `${API}/imagesaccepted/accept`,{supplierId,img});
@@ -80,7 +80,7 @@ console.log(API)
             
       
           } catch (error) {
-            console.error("Error accepting image:", error);
+            // console.error("Error accepting image:", error);
           }
   };
 
@@ -120,10 +120,10 @@ console.log(API)
                 }, 5000);
       
             } else {
-              console.error("Unexpected response status:", response.status);
+              // console.error("Unexpected response status:", response.status);
             }
           } catch (error) {
-            console.error("Error submitting reject reason:", error);
+            // console.error("Error submitting reject reason:", error);
           }
     // setShowRejectPopup(false);
     // setRejectReason('');
@@ -168,7 +168,7 @@ console.log(API)
     if (datas.length === 0) return <div className="text-center text-red-500">No data found</div>;
 
     // const currentSupplier = datas[currentPage];
-console.log(selectedImage)
+// console.log(selectedImage)
     return (
 <div className="container mx-auto px-4 py-6  ">
       {datas.map((supplier) => (

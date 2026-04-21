@@ -802,11 +802,10 @@
 
 
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import * as XLSX from 'xlsx-js-style';
-import { Upload, AlertCircle, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle, XCircle, Trash2, Send } from 'lucide-react';
 import { COLUMN_HEADER_MAP, FIELD_DATA_TYPES } from '../constants/diamondConstants';
-import { parseExcelDate } from '../utils/excelBuilder';
 
 // ─── Sheet names exactly as in the Excel template ────────────────────────────
 const MAIN_SHEET_NAME    = 'Purchase Entry';
@@ -920,14 +919,6 @@ const validateBusinessRules = (mainData, diamondData, csData) => {
   return errors;
 };
 
-const validateHeaderFields = (invoiceNumber, invoiceDate) => {
-  const errors = [];
-  if (!invoiceNumber || String(invoiceNumber).trim() === '')
-    errors.push('Invoice Number (cell B2) is empty — please fill it in the Excel template.');
-  if (!invoiceDate || String(invoiceDate).trim() === '' || invoiceDate === 'Invalid Date')
-    errors.push('Invoice Date (cell B3) is empty or invalid — please fill it in the Excel template.');
-  return errors;
-};
 
 // ─── Unified Error Card wrapper ───────────────────────────────────────────────
 const ErrorCard = ({ icon: Icon, iconColor, borderColor, bgColor, headerColor, title, children, footerText, footerColor, footerBg, footerBorder }) => (
@@ -1087,13 +1078,17 @@ const RuleErrorsNotice = ({ ruleErrors }) => (
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, supplierCode }) => {
-  const fileInputRef                              = useRef(null);
-  const [status, setStatus]                       = useState(null);
-  const [typeErrors, setTypeErrors]               = useState([]);
-  const [ruleErrors, setRuleErrors]               = useState([]);
-  const [skippedRows, setSkippedRows]             = useState([]);
+  const fileInputRef                                = useRef(null);
+  const [status, setStatus]                         = useState(null);
+  const [typeErrors, setTypeErrors]                 = useState([]);
+  const [ruleErrors, setRuleErrors]                 = useState([]);
+  const [skippedRows, setSkippedRows]               = useState([]);
   const [duplicateDesignNos, setDuplicateDesignNos] = useState([]);
-  const [hasData, setHasData]                     = useState(false);
+  const [hasData, setHasData]                       = useState(false);
+  const [parsedGrouped, setParsedGrouped]           = useState(null);
+  const [invoiceNo, setInvoiceNo]                   = useState('');
+  const [invoiceDateVal, setInvoiceDateVal]         = useState('');
+  const [submitError, setSubmitError]               = useState('');
 
   const clearFileInput = () => { if (fileInputRef.current) fileInputRef.current.value = ''; };
 
@@ -1104,15 +1099,69 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
     setSkippedRows([]);
     setDuplicateDesignNos([]);
     setHasData(false);
+    setParsedGrouped(null);
+    setInvoiceNo('');
+    setInvoiceDateVal('');
+    setSubmitError('');
     clearFileInput();
     onReset?.();
   };
 
-  // ── Derived: are there any blocking errors? ───────────────────────────────
-  const hasBlockingErrors =
-    typeErrors.length > 0 ||
-    ruleErrors.length > 0 ||
-    duplicateDesignNos.length > 0;
+  // ── Summary totals computed from parsed data ──────────────────────────────
+  const summary = useMemo(() => {
+    if (!parsedGrouped || parsedGrouped.length === 0) return null;
+    const sum = (key) =>
+      parsedGrouped.reduce((acc, r) => acc + (parseFloat(r[key]) || 0), 0);
+    const base = {
+      entries:        parsedGrouped.length,
+      totalPCS:       sum('PCS'),
+      // Gold
+      totalGoldWt:    sum('GoldWt'),
+      totalGNetWt:    sum('GNetWt'),
+      totalGoldValue: sum('GoldValue'),
+      // Platinum
+      totalPTWt:      sum('PTWt'),
+      totalPNetWt:    sum('PNetWt'),
+      totalPTValue:   sum('PTValue'),
+      // Diamond
+      totalDCarat:    sum('DCarat'),
+      totalDiaVal:    sum('DiamondValue'),
+      totalDiaWt:     sum('DiamondWt'),
+      // Color Stone
+      totalCSCarat:   sum('CLSCarat'),
+      totalCSAmt:     sum('CSAmount'),
+      // Totals
+      totalValue:     sum('TotalValue'),
+      totalGrandTotal: sum('GrandTotal'),
+    };
+    return {
+      ...base,
+      grandWt:       base.totalGoldWt  + base.totalPTWt  + base.totalDiaWt,
+      grandNetWt:    base.totalGNetWt  + base.totalPNetWt,
+      grandCarat:    base.totalDCarat  + base.totalCSCarat,
+      grandValueAmt: base.totalGoldValue + base.totalPTValue + base.totalDiaVal + base.totalCSAmt,
+    };
+  }, [parsedGrouped]);
+
+  // ── Submit: attach invoice fields and fire callback ───────────────────────
+  const handleSubmit = () => {
+    setSubmitError('');
+    if (!invoiceNo.trim()) {
+      setSubmitError('Invoice No is required.');
+      return;
+    }
+    if (!invoiceDateVal) {
+      setSubmitError('Invoice Date is required.');
+      return;
+    }
+    const invoiceRef = `${invoiceNo.trim()}|${invoiceDateVal}`;
+    const finalData = parsedGrouped.map((entry) => ({
+      ...entry,
+      invoiceNumber: invoiceRef,
+      invoiceDate:   invoiceDateVal,
+    }));
+    onDataLoaded?.(finalData);
+  };
 
   const handleFile = (e) => {
     const file = e.target.files?.[0];
@@ -1130,6 +1179,10 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
     setSkippedRows([]);
     setDuplicateDesignNos([]);
     setHasData(false);
+    setParsedGrouped(null);
+    setInvoiceNo('');
+    setInvoiceDateVal('');
+    setSubmitError('');
 
     const reader = new FileReader();
     reader.onload = (evt) => {
@@ -1146,20 +1199,7 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
           return;
         }
 
-        const invoiceNumber = mainSheet['B2']?.v ?? '';
-        const invoiceDate   = parseExcelDate(mainSheet['B3']?.v ?? '');
-        const invoiceRef    = invoiceNumber ? `${invoiceNumber}|${invoiceDate}` : '';
-
-        // STEP 1: Validate header fields
-        const headerErrors = validateHeaderFields(invoiceNumber, invoiceDate);
-        if (headerErrors.length) {
-          setRuleErrors(headerErrors);
-          setStatus({ type: 'error', message: `Missing header fields (${headerErrors.length}). Fix and re-upload.` });
-          clearFileInput();
-          return;
-        }
-
-        // STEP 2: Parse rows
+        // STEP 1: Parse rows (invoice no/date will be entered manually)
         const allRawMain = XLSX.utils.sheet_to_json(mainSheet, {
           range: MAIN_SHEET_HEADER_ROW,
           defval: '',
@@ -1223,15 +1263,13 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
           return;
         }
 
-        // STEP 5: Type-validate + map
+        // STEP 5: Type-validate + map (invoice fields attached later at submit)
         const tErrors  = [];
         const mainData = validRawMain.map((row, idx) => {
-          const mapped         = mapExcelRow(row, idx, tErrors);
-          mapped.SupplierName  = supplierName;
-          mapped.suppCode      = supplierCode;
-          mapped.po_number     = selectedPO;
-          mapped.invoiceNumber = invoiceRef;
-          mapped.invoiceDate   = invoiceDate;
+          const mapped        = mapExcelRow(row, idx, tErrors);
+          mapped.SupplierName = supplierName;
+          mapped.suppCode     = supplierCode;
+          mapped.po_number    = selectedPO;
           return mapped;
         });
 
@@ -1273,7 +1311,7 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
           setSkippedRows(skipped);
           setStatus({ type: 'error', message: `Validation errors (${bErrors.length}). Fix and re-upload.` });
           clearFileInput();
-          return; // ← Save is blocked here
+          return;
         }
 
         // STEP 9: Group diamonds + color stones
@@ -1292,24 +1330,16 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
           };
         });
 
-        // ── SUCCESS ───────────────────────────────────────────────────────
+        // ── SUCCESS — store parsed data; user fills invoice fields then submits
         setTypeErrors([]);
         setRuleErrors([]);
         setDuplicateDesignNos([]);
         setSkippedRows(skipped);
-        setStatus({
-          type: 'success',
-          message:
-            `Loaded ${grouped.length} entr${grouped.length !== 1 ? 'ies' : 'y'} · ` +
-            `PO: ${selectedPO} · ${supplierName || 'Unknown Supplier'}` +
-            (skipped.length ? ` · ${skipped.length} row${skipped.length > 1 ? 's' : ''} skipped` : ''),
-        });
+        setParsedGrouped(grouped);
         setHasData(true);
         clearFileInput();
-        onDataLoaded?.(grouped);
 
       } catch (err) {
-        console.error(err);
         setStatus({ type: 'error', message: 'Failed to read file. Check the format and try again.' });
         setTypeErrors([]);
         setRuleErrors([]);
@@ -1320,6 +1350,8 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
     };
     reader.readAsBinaryString(file);
   };
+
+  const fmt = (n) => (n % 1 === 0 ? n.toLocaleString() : n.toFixed(3));
 
   return (
     <div className="space-y-3">
@@ -1375,28 +1407,159 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
         )}
       </div>
 
-      {/* ── Status banner ───────────────────────────────────────────────── */}
-      {status && (
-        <div
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
-            status.type === 'success'
-              ? 'bg-green-50 border-green-200 text-green-800'
-              : 'bg-red-50 border-red-200 text-red-800'
-          }`}
-        >
-          {status.type === 'success'
-            ? <CheckCircle className="w-4 h-4 shrink-0 text-green-500" />
-            : <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
-          }
+      {/* ── Error status banner (only shown on errors) ──────────────────── */}
+      {status && status.type === 'error' && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium bg-red-50 border-red-200 text-red-800">
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
           <span>{status.message}</span>
         </div>
       )}
 
-      {/* ── Error / notice cards — uniform gap ──────────────────────────── */}
+      {/* ── Error / notice cards ─────────────────────────────────────────── */}
       {skippedRows.length > 0        && <SkippedRowsNotice      skippedRows={skippedRows} />}
       {duplicateDesignNos.length > 0 && <DuplicateDesignNoNotice duplicates={duplicateDesignNos} />}
       {typeErrors.length > 0         && <ValidationErrorsTable   errors={typeErrors} />}
       {ruleErrors.length > 0         && <RuleErrorsNotice         ruleErrors={ruleErrors} />}
+
+      {/* ── Summary + Invoice entry (shown after successful parse) ───────── */}
+      {summary && (
+        <div className="rounded-lg border border-green-200 bg-green-50 overflow-hidden">
+
+          {/* Summary header */}
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-green-200">
+            <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+            <span className="font-semibold text-sm text-green-800">
+              Upload Summary — {summary.entries} {summary.entries === 1 ? 'Entry' : 'Entries'} Loaded
+              {skippedRows.length > 0 && (
+                <span className="ml-2 text-xs font-normal text-green-600">
+                  ({skippedRows.length} row{skippedRows.length > 1 ? 's' : ''} skipped)
+                </span>
+              )}
+            </span>
+          </div>
+
+          {/* Totals — categorised */}
+          {/* Summary Table */}
+          <div className="overflow-auto border-b border-green-200">
+            <table className="min-w-full text-xs border-collapse">
+              <thead>
+                <tr className="bg-gray-100 text-gray-600 uppercase tracking-wide">
+                  <th className="border border-gray-200 px-3 py-2 text-left font-semibold w-28">Category</th>
+                  <th className="border border-gray-200 px-3 py-2 text-right font-semibold">Entries</th>
+                  <th className="border border-gray-200 px-3 py-2 text-right font-semibold">PCS</th>
+                  <th className="border border-gray-200 px-3 py-2 text-right font-semibold">Wt</th>
+                  <th className="border border-gray-200 px-3 py-2 text-right font-semibold">Net Wt</th>
+                  <th className="border border-gray-200 px-3 py-2 text-right font-semibold">Carat</th>
+                  <th className="border border-gray-200 px-3 py-2 text-right font-semibold">Value / Amt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* General */}
+                <tr className="bg-emerald-50">
+                  <td className="border border-gray-200 px-3 py-2 font-semibold text-emerald-700">General</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{summary.entries}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalPCS)}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                </tr>
+                {/* Gold */}
+                <tr className="bg-yellow-50">
+                  <td className="border border-gray-200 px-3 py-2 font-semibold text-yellow-700">Gold</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalGoldWt)}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalGNetWt)}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalGoldValue)}</td>
+                </tr>
+                {/* Platinum */}
+                <tr className="bg-slate-50">
+                  <td className="border border-gray-200 px-3 py-2 font-semibold text-slate-600">Platinum</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalPTWt)}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalPNetWt)}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalPTValue)}</td>
+                </tr>
+                {/* Diamond */}
+                <tr className="bg-blue-50">
+                  <td className="border border-gray-200 px-3 py-2 font-semibold text-blue-700">Diamond</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalDiaWt)}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalDCarat)}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalDiaVal)}</td>
+                </tr>
+                {/* Color Stone */}
+                <tr className="bg-purple-50">
+                  <td className="border border-gray-200 px-3 py-2 font-semibold text-purple-700">Color Stone</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right text-gray-500">0</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalCSCarat)}</td>
+                  <td className="border border-gray-200 px-3 py-2 text-right font-bold text-gray-800">{fmt(summary.totalCSAmt)}</td>
+                </tr>
+                {/* Grand Total */}
+                <tr className="bg-green-100 border-t-2 border-green-400">
+                  <td className="border border-green-300 px-3 py-2 font-bold text-green-800">Grand Total</td>
+                  <td className="border border-green-300 px-3 py-2 text-right font-extrabold text-green-900">{summary.entries}</td>
+                  <td className="border border-green-300 px-3 py-2 text-right font-extrabold text-green-900">{fmt(summary.totalPCS)}</td>
+                  <td className="border border-green-300 px-3 py-2 text-right font-extrabold text-green-900">{fmt(summary.grandWt)}</td>
+                  <td className="border border-green-300 px-3 py-2 text-right font-extrabold text-green-900">{fmt(summary.grandNetWt)}</td>
+                  <td className="border border-green-300 px-3 py-2 text-right font-extrabold text-green-900">{fmt(summary.grandCarat)}</td>
+                  <td className="border border-green-300 px-3 py-2 text-right font-extrabold text-green-900 text-sm">{fmt(summary.grandValueAmt)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Invoice inputs */}
+          <div className="px-4 py-3 space-y-3">
+            <p className="text-xs text-green-700 font-medium">
+              Enter invoice details to submit:
+            </p>
+            <div className="flex flex-wrap gap-3 items-end">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-600">Invoice No <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={invoiceNo}
+                  onChange={(e) => { setInvoiceNo(e.target.value); setSubmitError(''); }}
+                  placeholder="Enter Invoice No"
+                  className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-gray-600">Invoice Date <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={invoiceDateVal}
+                  onChange={(e) => { setInvoiceDateVal(e.target.value); setSubmitError(''); }}
+                  placeholder="DD/MM/YYYY"
+                  className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <button
+                onClick={handleSubmit}
+                className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-md text-sm font-medium transition-colors"
+              >
+                <Send className="w-4 h-4 shrink-0" />
+                Submit
+              </button>
+            </div>
+
+            {/* Inline validation message */}
+            {submitError && (
+              <p className="text-xs text-red-600 font-medium">{submitError}</p>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );

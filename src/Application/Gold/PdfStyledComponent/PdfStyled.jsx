@@ -243,6 +243,16 @@ import {
       fontSize: 7,
       textDecoration: "underline",
     },
+    poInfo: {
+      position: "absolute",
+      left: 20,
+      top: 30,
+    },
+    poInfoText: {
+      fontSize: 10,
+      fontWeight: "bold",
+      color: "#1e40af",
+    },
   });
   export default styles;
   

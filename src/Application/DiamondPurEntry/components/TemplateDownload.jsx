@@ -329,7 +329,7 @@ const TemplateDownload = ({
       
       onSuccess?.('Template downloaded successfully!');
     } catch (error) {
-      console.error('Download error:', error);
+      // console.error('Download error:', error);
       onSuccess?.('Failed to download template. Please try again.');
     } finally {
       setDownloading(false);

@@ -76,7 +76,7 @@ const PoEntryPage = () => {
           }));
         }
       } catch (error) {
-        console.error("Photo capture error:", error);
+        // console.error("Photo capture error:", error);
         setFormData((prev) => ({
           ...prev,
           photo: file,
@@ -114,18 +114,18 @@ const PoEntryPage = () => {
 
     try {
       // Add your form submission logic here
-      console.log("Form submitted:", initialData);
+      // console.log("Form submitted:", initialData);
 
       // Reset form after successful submission if needed
       // setFormData({});
     } catch (error) {
-      console.error("Submit error:", error);
+      // console.error("Submit error:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  console.log(initialData);
+  // console.log(initialData);
 
   return (
     <div className="min-h-screen bg-gray-50/30 p-2 sm:p-2 lg:p-3">

@@ -26,10 +26,10 @@ function MasterExcelUpload() {
             'Content-Type': 'multipart/form-data',
           },
         });
-        console.log('Upload successful:', response.data);
+        // console.log('Upload successful:', response.data);
         // Handle success
       } catch (error) {
-        console.error('Upload failed:', error);
+        // console.error('Upload failed:', error);
         // Handle error
       }
     };

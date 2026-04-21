@@ -36,7 +36,7 @@ const ContactInformation = () => {
             localStorage.setItem("KycContact", JSON.stringify(contactInfo));
             setActiveComponent(userRole.includes("Hallmark") ? "Hallmark Information" : "Trade Information");
         } else {
-            console.log("Form has errors. Cannot proceed to next section.");
+            // console.log("Form has errors. Cannot proceed to next section.");
         }
     };
 

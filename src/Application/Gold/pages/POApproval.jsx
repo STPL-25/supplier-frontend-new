@@ -38,8 +38,8 @@ function POApproval() {
 
   const { generatePdf, isGenerating, errors } = useSendToServer({
     onPdfGenerated: (pdfFile) => {
-      console.log(pdfFile);
-      console.log("PDF generated successfully");
+      // console.log(pdfFile);
+      // console.log("PDF generated successfully");
     },
   });
 
@@ -68,29 +68,29 @@ function POApproval() {
         );
         setSuppliers(response.data.supplierNames);
       } catch (error) {
-        console.error("Error fetching supplier and PO details:", error);
+        // console.error("Error fetching supplier and PO details:", error);
         showSnackbar("Failed to fetch suppliers", "error");
       }
     };
     fetchSupplier();
   }, [userRole]);
 
-  useEffect(() => {
-    const fetchPoDetails = async () => {
-      try {
-        const response = await axios.get(
-          `${API}/gold_po/fetch_po_number/${selectedSupplier}/${userRole}/Pending`
-        );
-        setPoNumbers(response.data.filteredData.poNumbers);
-      } catch (error) {
-        setError('No Data Found')
-        console.error("Error fetching supplier and PO details:", error);
-        showSnackbar("Failed to fetch PO numbers", "error");
-      }
-    };
+  const fetchPoNumbers = async () => {
+    if (!selectedSupplier) return;
+    try {
+      const response = await axios.get(
+        `${API}/gold_po/fetch_po_number/${selectedSupplier}/${userRole}/Pending`
+      );
+      setPoNumbers(response.data.filteredData.poNumbers);
+    } catch (error) {
+      // console.error("Error fetching supplier and PO details:", error);
+      setPoNumbers([]);
+    }
+  };
 
+  useEffect(() => {
     if (selectedSupplier) {
-      fetchPoDetails();
+      fetchPoNumbers();
     } else {
       setPoNumbers([]);
     }
@@ -99,6 +99,7 @@ function POApproval() {
   const fetchPoCreationDetails = async () => {
     setIsLoading(true);
     setError(null);
+    setFilteredData([]);
 
     try {
       const response = await axios.post(
@@ -121,8 +122,12 @@ function POApproval() {
         const addressData = response.data.address;
         const poCreationData = response.data.data;
 
-        if (!poCreationData) {
-          throw new Error("PO creation data is missing");
+        if (!poCreationData || poCreationData.length === 0) {
+          setFilteredData([]);
+          setPoAddressData({});
+          setSelectedPoNumber("");
+          fetchPoNumbers();
+          return;
         }
 
         setFilteredData(poCreationData);
@@ -131,11 +136,12 @@ function POApproval() {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error fetching PO creation details:", error);
-      showSnackbar("No Data Found", "error");
+      // console.error("Error fetching PO creation details:", error);
       setError(error.message);
       setFilteredData([]);
       setPoAddressData({});
+      setSelectedPoNumber("");
+      fetchPoNumbers();
     } finally {
       setIsLoading(false);
     }
@@ -164,7 +170,7 @@ function POApproval() {
   const handleToDateChange = (event) => {
     setToDate(event.target.value);
   };
-console.log(selectedPoNumber);
+// console.log(selectedPoNumber);
   return (
     <div className="w-full max-w-full">
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">

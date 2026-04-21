@@ -155,7 +155,7 @@ const DiamondProvider = ({ children }) => {
   });
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
-console.log(name,checked)
+// console.log(name,checked)
     // Create a new state object with the current change
     let newMetalTypeData = { ...metalTypeData, [name]: checked };
 
@@ -491,7 +491,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
   const memoizedInputFields = useMemo(() => inputFields, [JSON.stringify(inputFields)]);
   useEffect(() => {
     calculations();
-    console.log("Data")
+    // console.log("Data")
   }, [memoizedInputFields, totalDiamondData, totalClrstnData, metalTypeData]);
   // totalDiamondData, inputFields, totalClrstnData, metalTypeData
   // console.log(inputFields)
@@ -660,10 +660,10 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
 
   }, [metalTypeData])
 
-  console.log(inputFields)
+  // console.log(inputFields)
   const validateFields = (name, value, index = null) => {
-    console.log(name, value)
-    console.log(metalTypeData.gold)
+    // console.log(name, value)
+    // console.log(metalTypeData.gold)
     setErrors((prevErrors) => {
       const updatedErrors = { ...prevErrors };
       let fieldName = name;
@@ -677,7 +677,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
 
       // Check if the field contains any non-alphanumeric characters
       if (name !== 'HUID' && value && !alphanumericPattern.test(value)) {
-        console.log(name)
+        // console.log(name)
         updatedErrors[fieldName] = `${name} cannot contain special characters`;
       }
       else if (["ProductName",
@@ -787,7 +787,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
         updatedErrors[fieldName] = `${name} is required`;
       }
       if (name === "GNetWt" && value <= 0 && metalTypeData.gold) {
-        console.log("gm data")
+        // console.log("gm data")
         updatedErrors.GNetWt = "GNetWt cannot be negative or 0";
       }
       else if (name === "PNetWt" && value <= 0 && (!metalTypeData.gold && metalTypeData.platinum)) {
@@ -800,7 +800,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
       return updatedErrors;
     });
   };
-  console.log(errors)
+  // console.log(errors)
   const resetFields = () => {
     // Reset input fields to initial state
     setInputFields({
@@ -874,7 +874,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
       GrandTotal: 0,
       HUID: "",
     });
-  console.log(inputFields)
+  // console.log(inputFields)
     // Reset diamond data to initial state
     setTotalDiamondData([{
       diamondShape: null,
@@ -1058,7 +1058,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
 
       // 3. Validate Diamond Fields
       if (metalTypeData.diamond) {
-        console.log("Validating Diamond Fields");
+        // console.log("Validating Diamond Fields");
         totalDiamondData.forEach((diamond, index) => {
           if (!diamond.diamondShape) {
             newErrors[`diamondShape_${index}`] = `Diamond shape is required`;
@@ -1135,7 +1135,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
 
       // 6. If there are any errors, stop submission
       if (Object.keys(newErrors).length > 0) {
-        console.log("Validation errors occurred:", newErrors);
+        // console.log("Validation errors occurred:", newErrors);
         toast.error("Please fill Required Fields"); // Show error toast
         return; // Prevent form submission
       }
@@ -1162,7 +1162,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
     } catch (error) {
       toast.error("Error submitting data!"); // Show error toast
 
-      console.error("Error submitting data:", error);
+      // console.error("Error submitting data:", error);
       // Optionally, set a global error message here
     }
   };
@@ -1171,7 +1171,7 @@ Do you wish to continue? Press OK to confirm or Cancel to keep it.`);
     localStorage.removeItem("EstNo")
     window.location.reload();
   }
-  console.log(errors)
+  // console.log(errors)
   // console.log(metalTypeData)
   return (
     <DiamondContext.Provider

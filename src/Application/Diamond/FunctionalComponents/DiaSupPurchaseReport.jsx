@@ -46,7 +46,7 @@ const SupPurchaseReport = () => {
       if (!stonesString || stonesString === '[]') return [];
       return JSON.parse(stonesString);
     } catch (error) {
-      console.error('Error parsing stones:', error);
+      // console.error('Error parsing stones:', error);
       return [];
     }
   };
@@ -139,7 +139,7 @@ const SupPurchaseReport = () => {
       setPurchaseData(data);
       setFilteredData(data);
     } catch (error) {
-      console.error('Error fetching purchase entries:', error);
+      // console.error('Error fetching purchase entries:', error);
       setPurchaseData([]);
       setFilteredData([]);
     } finally {

@@ -50,7 +50,7 @@ const useFetch = (url, options = {}) => {
       return result.data;
     } catch (err) {
       if (axios.isCancel(err)) {
-        console.log('Request canceled:', err.message);
+        // console.log('Request canceled:', err.message);
       } else {
         setError(err);
       }

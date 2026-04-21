@@ -12,6 +12,9 @@ function App() {
  
 const {user}=useContext(DashBoardContext)
 
+
+// console.log(user);
+
   return (
     <>
       <BrowserRouter>

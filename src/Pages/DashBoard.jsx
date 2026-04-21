@@ -83,7 +83,7 @@ const Dashboard = () => {
       const decodedToken = jwtDecode(Securedtoken);
       const role = decodedToken.role;
       const roleData=decodedToken.role_data;
-      console.log(roleData);
+      // console.log(roleData);
       setUserRole(role);
     }
   }, []);
@@ -120,7 +120,9 @@ const Dashboard = () => {
           "GoldHallmark-Supplier": "GoldHallmarkSupplier",
           "SilverHallmark-Supplier": "SilverHallmarkSupplier",
           "MIS":"MIS",
-          "Executive-Director":"ExecutiveDirector"
+          "Executive-Director":"ExecutiveDirector",
+          "Demo-User":"DemoUser"
+
         };
         return roleMap[role];
       }
@@ -135,7 +137,7 @@ const Dashboard = () => {
         );
         setMenuItems(response.data)
       } catch (error) {
-        console.error("Error fetching menu items:", error);
+        // console.error("Error fetching menu items:", error);
       }
     };
 

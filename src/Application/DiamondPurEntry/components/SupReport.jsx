@@ -187,7 +187,7 @@ const SupPurchaseReport = () => {
       setPurchaseData(data);
       setFilteredData(data);
     } catch (error) {
-      console.error('Error fetching purchase entries:', error);
+      // console.error('Error fetching purchase entries:', error);
       setPurchaseData([]);
       setFilteredData([]);
     } finally {

@@ -107,7 +107,7 @@ const BulkUploadForm = ({ inputFields, totalDiamondData, totalClrstnData }) => {
       }
     } catch (error) {
       toast.error("Something went wrong while submitting.");
-      console.error("Error:", error);
+      // console.error("Error:", error);
     }
   };
 

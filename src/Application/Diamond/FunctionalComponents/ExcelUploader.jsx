@@ -1001,7 +1001,7 @@ const DiamondManager = () => {
         setUploadStatus({ type: 'success', message: `✓ Loaded ${grouped.length} entries for ${supplierName || 'Unknown Supplier'}` });
         if (fileInputRef.current) fileInputRef.current.value = '';
       } catch (error) {
-        console.error(error);
+        // console.error(error);
         setUploadStatus({ type: 'error', message: 'Error reading file — check format' });
         setDataTypeErrors([]); setValidationErrors([]);
       }

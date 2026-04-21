@@ -17,7 +17,7 @@ function ClrstnType() {
                 const response= await axios.get(`${API}/dia/findAll_colorstone_options`)
                 setColorStoneOptions(response.data)
             } catch (error) {
-                console.log(error);
+                // console.log(error);
             }
         }
         fetchColorStoneOptions()
@@ -41,7 +41,7 @@ function ClrstnType() {
 
 // // console.log(totalClrstnData)
 const handleChange = (index, value, field) => {
-    console.log(index, value, field);
+    // console.log(index, value, field);
     
     const numericFields = ["csPcs", "csCarat", "csRate", "csWt"];
     

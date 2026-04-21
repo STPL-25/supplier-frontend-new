@@ -123,7 +123,7 @@ const ReturnDialog = ({ isOpen, onClose, onSubmit, rowData }) => {
       setImages([]);
       setPreviewUrls([]);
     } catch (error) {
-      console.error("Error submitting return:", error);
+      // console.error("Error submitting return:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -389,7 +389,7 @@ const PurchaseReturn = () => {
   };
 
   const handleBulkReturn = () => {
-    console.log(selectedRows);
+    // console.log(selectedRows);
     const selectedData = Array.from(selectedRows).map((row) => row);
     setSelectedRow(selectedData);
     setShowReturnDialog(true);
@@ -414,7 +414,7 @@ const PurchaseReturn = () => {
         );
         setSuppliers(response.data.filter(Boolean));
       } catch (error) {
-        console.error("Error fetching suppliers:", error);
+        // console.error("Error fetching suppliers:", error);
       }
     };
     fetchSuppliers();
@@ -427,7 +427,7 @@ const PurchaseReturn = () => {
         );
         setInvoices(response.data);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchInvoiceNumber();
@@ -444,21 +444,21 @@ const PurchaseReturn = () => {
           selectedInvoice
         )}`
       );
-      console.log(
-        "8888888888888888888888888888888888888888888888888",
-        response.data
-      );
+      // console.log(
+      //   "8888888888888888888888888888888888888888888888888",
+      //   response.data
+      // );
 
       setData(response.data);
       // Clear selected rows when data changes
       setSelectedRows(new Set());
     } catch (error) {
-      console.error("Error fetching data:", error);
+      // console.error("Error fetching data:", error);
     }
   };
   // Handle return submission
   const handleReturn = async (formData, images, remarks) => {
-    console.log(images, remarks);
+    // console.log(images, remarks);
     try {
       const response = await axios.post(
         `${DIA_API}/return_purchase/items`,
@@ -485,7 +485,7 @@ const PurchaseReturn = () => {
       setSelectedRow(null);
       setSelectedRows(new Set()); // Clear selections after successful return
     } catch (error) {
-      console.error("Error processing return:", error);
+      // console.error("Error processing return:", error);
     }
   };
 
@@ -504,7 +504,7 @@ const PurchaseReturn = () => {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error("Export failed:", error);
+      // console.error("Export failed:", error);
     }
   };
 

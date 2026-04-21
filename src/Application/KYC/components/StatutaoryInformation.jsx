@@ -34,7 +34,7 @@ function StatutaoryInformation() {
             localStorage.setItem("KycStat", JSON.stringify(statutatoryInfo));
             setActiveComponent("Banking Information");
         } else {
-            console.log("Form has errors. Cannot proceed to next section.");
+            // console.log("Form has errors. Cannot proceed to next section.");
         }
     };
 

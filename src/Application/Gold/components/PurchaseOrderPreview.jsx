@@ -54,8 +54,8 @@ const formatWt = (val) =>
     : "-";
 
 const PurchaseOrderPreview = ({ datas, supplierDetails }) => {
-  console.log(supplierDetails)
-    console.log(datas)
+  // console.log(supplierDetails)
+    // console.log(datas)
 
   const totals = calculateTotals(datas);
   const isTct = supplierDetails?.poDetails?.poNumber?.includes("TCT");

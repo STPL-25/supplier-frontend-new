@@ -10,7 +10,7 @@ function Gold() {
     setInputFields(prevData=>({...prevData,GCarat:value}))
     validateFields("GCarat",value)
 
-    console.log(errors)
+    // console.log(errors)
       };
   return (
     <div>

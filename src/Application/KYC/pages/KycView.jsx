@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 
 function KycView() {
     const { user, KYC_API, userRole, userData } = useContext(KycContext);
-    console.log(HeaderData);
+    // console.log(HeaderData);
     // {
     //     title: "Hallmark Information",
     //     fields: {

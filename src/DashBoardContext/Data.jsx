@@ -61,11 +61,18 @@ import {
   GoogleSheetsPurchaseManager,
   PurchaseReport,
   DebitCreditNotePage,
+  SupplierDebitCreditView,
+  DebitCreditReport,
   SupPurchaseReport,
   QCCheckReport,
   DiamondQuotationForm ,
   DiamondQuotationApproval,
-  PoRateFixing
+  PoRateFixing,
+  CustomerOrderDetails,
+  DemoKycPurchaseApproval,
+  DemoKycAcManagerApproval,
+  DemoKycAprovalMis,
+  PoRateFixingReport 
 } from "../Components/ComponentRoutes";
 import { DiamondProvider } from "../Application/Diamond/DiamondGridContext/DiamondGridContext";
 import {
@@ -143,6 +150,21 @@ const sectionComponents = {
   "Kyc Approval": (
     <KycDataProvider>
       <KycApproval />
+    </KycDataProvider>
+  ),
+  "Demo Kyc Purchase Approval": (
+    <KycDataProvider>
+      <DemoKycPurchaseApproval />
+    </KycDataProvider>
+  ),
+  "Demo Kyc Ac Manager Approval": (
+    <KycDataProvider>
+      <DemoKycAcManagerApproval />
+    </KycDataProvider>
+  ),
+  "Demo Kyc Mis Approval": (
+    <KycDataProvider>
+      <DemoKycAprovalMis />
     </KycDataProvider>
   ),
   "Approved KYCs": (
@@ -236,9 +258,13 @@ const sectionComponents = {
     //   </DiamondProvider>
     // ),
     "Credit Note And Debit Note": <DebitCreditNotePage />,
+    "Supplier Debit Credit View": <SupplierDebitCreditView />,
+    "Debit Credit Note Report": <DebitCreditReport />,
     "Diamond Quotation Form": <DiamondQuotationForm />,
     "Diamond Quotation Approval": <DiamondQuotationApproval />,
-    "Po Rate Fixing": <PoRateFixing />
+    "Po Rate Fixing": <PoRateFixing />,
+    "Po Rate Fixing Report": <PoRateFixingReport />,
+    "Customer Order Details": <CustomerOrderDetails />
 
   
 };
@@ -261,6 +287,9 @@ const sectionImages = {
   "PO Report": pocreation,
   Print: contacticon,
   "Kyc Approval": adminIcon,
+  "Demo Kyc Purchase Approval": adminIcon,
+  "Demo Kyc Ac Manager Approval": adminIcon,
+  "Demo Kyc Mis Approval": adminIcon,
   "Rate Accept": rateacceptImage,
   "Supplier PO": supplierpo,
   "View Report": bankingicon,
@@ -274,5 +303,8 @@ const sectionImages = {
   "Fund Planning": bankingicon,
   "PO Stock Allocation":masterApprovalIcon ,
   "View Kyc": KycViewImage,
+  "Customer Order Details": hallmark,
+  "Po Rate Fixing": rateacceptImage,
+  "Credit Note And Debit Note":bankingicon ,
 };
 export { sectionComponents, sectionImages };

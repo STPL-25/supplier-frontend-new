@@ -424,7 +424,7 @@ const ReportPage = () => {
         setError(null);
       } catch (err) {
         setError(err.message || "Failed to fetch reports");
-        console.error("Error fetching reports:", err);
+        // console.error("Error fetching reports:", err);
       } finally {
         setLoading(false);
       }

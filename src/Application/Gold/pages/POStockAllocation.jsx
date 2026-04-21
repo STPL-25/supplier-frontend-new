@@ -1145,13 +1145,13 @@ export default function POStockAllocation() {
 
   const { generatePdf } = useSendToServer({
     onPdfGenerated: () => {
-      console.log("Parent→TCT PDF generated successfully")
+      // console.log("Parent→TCT PDF generated successfully")
     },
   })
 
   const { generatePdf: generateTctPdf } = useTctSendToServer({
     onPdfGenerated: () => {
-      console.log("TCT→Supplier PDF generated successfully")
+      // console.log("TCT→Supplier PDF generated successfully")
     },
   })
 
@@ -1248,7 +1248,7 @@ export default function POStockAllocation() {
         setApprovedPoAllDetails(response.data.result || [])
         toast.success("Purchase orders loaded successfully")
       } catch (error) {
-        console.error("Error fetching approved POs:", error)
+        // console.error("Error fetching approved POs:", error)
         toast.error("Failed to fetch approved POs")
       } finally {
         setIsFetching(false)
@@ -1279,13 +1279,13 @@ export default function POStockAllocation() {
   const handlePOSelect = (value) => {
 
     setSelectedPO(value)
-    console.log("555555555555555",value)
+    // console.log("555555555555555",value)
     // Reset fields
     handleReset(false)
     const poItems = approvedPoAllDetails.filter(
       (po) => po.poNumber == value
     )
-console.log(poItems)
+// console.log(poItems)
 
     if (poItems.length > 0) {
       setSelectedPoItems(poItems)
@@ -1301,7 +1301,7 @@ console.log(poItems)
     }
   }
 
-  console.log(selectedPO)
+  // console.log(selectedPO)
 
   const handleParentStockAvailability = (value) => {
     const isAvailable = value === "yes"
@@ -1351,7 +1351,7 @@ console.log(poItems)
       date.setDate(date.getDate() - 1)
       return date.toLocaleDateString("en-GB")
     } catch (error) {
-      console.error("Error parsing date:", error)
+      // console.error("Error parsing date:", error)
       return "Invalid Date"
     }
   }
@@ -1477,13 +1477,13 @@ console.log(poItems)
           },
         }
 
-        console.log("Approval Payload:", approvalPayload)
+        // console.log("Approval Payload:", approvalPayload)
 
         const response = await axios.post(
           `${API}/gold_po/stock_allocation`,
           approvalPayload
         )
-        console.log("PO Stock Allocation Response:", response.data)
+        // console.log("PO Stock Allocation Response:", response.data)
 
         if (response.data.findPoDatas) {
           const filteredItems = response.data.findPoDatas
@@ -1507,13 +1507,13 @@ console.log(poItems)
           supplierStockAvailable,
         }
 
-        console.log("Rejection Payload:", rejectionPayload)
+        // console.log("Rejection Payload:", rejectionPayload)
 
         const response = await axios.post(
           `${API}/gold_po/stock_allocation/reject`,
           rejectionPayload
         )
-        console.log("PO Rejection Response:", response.data)
+        // console.log("PO Rejection Response:", response.data)
 
         toast.success("PO Rejected", {
           description: "Purchase Order has been rejected successfully",
@@ -1525,7 +1525,7 @@ console.log(poItems)
       setApprovedPOs(refreshResponse.data.approvedTctPos || [])
       setApprovedPoAllDetails(refreshResponse.data.result || [])
     } catch (error) {
-      console.error("Error processing PO:", error)
+      // console.error("Error processing PO:", error)
       toast.error("Error processing PO", {
         description:
           error?.response?.data?.message ||

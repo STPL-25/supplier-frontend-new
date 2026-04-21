@@ -9,9 +9,9 @@ function Wastage() {
       setLoopErr(true)
     }
     handleInputChange(e); 
-    console.log(e)
+    // console.log(e)
     const objectString = JSON.stringify(inputFields);
-    console.log(objectString);
+    // console.log(objectString);
       };
   return (
     <div>

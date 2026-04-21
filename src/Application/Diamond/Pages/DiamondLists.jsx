@@ -21,7 +21,7 @@ function DiamondLists() {
   // const [refNo,setRefNo]=useState("")
   const [errorMsg, setErrorMsg] = useState("")
   const [statusData, setStatusData] = useState([])
-  console.log(XLSX)
+  // console.log(XLSX)
   // const navigate = useNavigate();
   const { inputFields, setInputFields, metalTypeData, setMetalTypeData, user, setTotalDiamondData, totalDiamondData, diamondData, setDiamondData, setTotalClrstnData, setclrStn, errors, setErrors } =
     useContext(DiamondContext);
@@ -31,8 +31,8 @@ function DiamondLists() {
   const [isRefNoActive, setIsRefNoActive] = useState(false)
   const [selectedItems, setSelectedItems] = useState([])
   const [invDate, setInvDate] = useState("")
-  console.log(user)
-  console.log(rows)
+  // console.log(user)
+  // console.log(rows)
   const { renderContent, setActiveSection, activeSection,setActiveComponent } = useContext(DashBoardContext)
 
   const TABLE_HEAD = [
@@ -110,7 +110,7 @@ function DiamondLists() {
     // { id: 'AcceptReject', label: 'Accept/Reject', type: 'text' },
   ];
   const totals = rows.reduce((acc, row) => {
-    console.log(acc, row)
+    // console.log(acc, row)
     TABLE_HEAD.forEach(col => {
       if (col.type === 'number' && col.id !== 'sno') {
         acc[col.id] = (acc[col.id] || 0) + (Number(row[col.id]) || 0);
@@ -128,7 +128,7 @@ function DiamondLists() {
       setRefNo(refNo)
       setEstimateNo(refNo)
 
-      console.log(estimateNo)
+      // console.log(estimateNo)
     } else if (estimateNo) {
       fetchData(estimateNo);
     }
@@ -167,11 +167,11 @@ function DiamondLists() {
   const handleEditRow = (index) => {
     // 1. Select the specific row data by index
     const selectedRow = rows[index];
-    console.log(selectedRow);
+    // console.log(selectedRow);
 
     // 2. Handle potential errors gracefully
     if (!selectedRow) {
-      console.error("Invalid row index provided. Please check your input.");
+      // console.error("Invalid row index provided. Please check your input.");
       return; // Exit the function if no valid row is found
     }
 
@@ -204,7 +204,7 @@ function DiamondLists() {
       }
     } catch (error) {
       toast.error("Error processing diamond/color stone data")
-      console.error("Error processing diamond/color stone data:", error);
+      // console.error("Error processing diamond/color stone data:", error);
       // Handle the error appropriately, e.g., display an error message to the user
       return; // Optionally, exit the function if the error is critical
     }
@@ -217,7 +217,7 @@ function DiamondLists() {
     setMetalTypeData(selectedRow.metalTypeData)
     setErrors({})
   };
-  console.log(totalDiamondData, metalTypeData, inputFields)
+  // console.log(totalDiamondData, metalTypeData, inputFields)
   const handleSubmitData = async () => {
     try {
 
@@ -231,7 +231,7 @@ function DiamondLists() {
 
         // console.log(encodeURIComponent(invNo))
         if (response.status === 200) {
-          console.log(response.data.message);
+          // console.log(response.data.message);
           toast.success("Data submitted successfully");
           setErrorMsg("")
 
@@ -255,14 +255,14 @@ function DiamondLists() {
       }
 
     } catch (error) {
-      console.log("please enter invoice number ")
+      // console.log("please enter invoice number ")
     }
   };
   const handleInvChange = (event) => {
     setInvNo(event.target.value)
     setErrorMsg("")
 
-    console.log(invNo)
+    // console.log(invNo)
   }
   const formatNumber = (value, columnId) => {
     // Columns requiring 3 decimal places
@@ -367,7 +367,7 @@ function DiamondLists() {
       // Remove the link from the document
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Error exporting to Excel:', error);
+      // console.error('Error exporting to Excel:', error);
     }
   };
 
@@ -383,7 +383,7 @@ function DiamondLists() {
   // const isChecked = (id) => {
   //   return selectedItems.includes(id);
   // };
-  console.log(selectedItems)
+  // console.log(selectedItems)
   return (
     <div>
       <ToastContainer />

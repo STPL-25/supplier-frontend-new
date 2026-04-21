@@ -25,14 +25,14 @@ function Admin() {
             const response = await axios.put(`${LOGG_API}/consolidativelist`, { filterValues });
             setAdminBoardDatas(response.data);
         } catch (error) {
-            console.log(error.message)
+            // console.log(error.message)
         }
     }
 
     useEffect(() => {
         const fetchRoleNames = async () => {
             const response = await axios.get(`${LOGG_API}/userrole`)
-            console.log(response.data);
+            // console.log(response.data);
             setUserRole(response.data)
         }
         fetchRoleNames()
@@ -70,7 +70,7 @@ function Admin() {
                 }
             }
         } catch (error) {
-            console.log(error.message);
+            // console.log(error.message);
         }
     };
 
@@ -82,7 +82,7 @@ function Admin() {
                 fetchCountData()
             }
         } catch (error) {
-            console.log(error.message)
+            // console.log(error.message)
         }
     }
 

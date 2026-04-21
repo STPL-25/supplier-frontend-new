@@ -61,7 +61,7 @@ const parseImages = (images) => {
       const parsed = JSON.parse(images);
       return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
-      console.error("Error parsing images:", error);
+      // console.error("Error parsing images:", error);
       return [];
     }
   }
@@ -104,7 +104,7 @@ function FixOrderApprovalScreen() {
         setPendingOrders(response.data);
       }
     } catch (error) {
-      console.error("Error fetching pending orders:", error);
+      // console.error("Error fetching pending orders:", error);
       showWarning("Could not connect to server");
     } finally {
       setLoading(false);
@@ -144,7 +144,7 @@ function FixOrderApprovalScreen() {
 
     showSuccess("Order approved successfully");
   } catch (error) {
-    console.error("Error approving order:", error);
+    // console.error("Error approving order:", error);
     showError(error.response?.data?.message || "Failed to approve order");
     
     // Revert on error - refetch to restore accurate state
@@ -178,7 +178,7 @@ const handleRejectConfirm = async () => {
     setSelectedOrder(null);
     setRejectReason("");
   } catch (error) {
-    console.error("Error rejecting order:", error);
+    // console.error("Error rejecting order:", error);
     showError(error.response?.data?.message || "Failed to reject order");
     
     // Revert on error
@@ -253,7 +253,7 @@ const handleRejectConfirm = async () => {
   };
 
   const onDocumentLoadError = (error) => {
-    console.error("Error loading PDF:", error);
+    // console.error("Error loading PDF:", error);
     setPdfLoading(false);
     showError("Failed to load PDF document");
   };

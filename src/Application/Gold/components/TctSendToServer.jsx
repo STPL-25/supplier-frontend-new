@@ -327,7 +327,7 @@ const timeOnly = updatedMoment.format("HH:mm:ss");
                       }
                       return "IV";
                     } catch (error) {
-                      console.error("Error parsing delivery data:", error);
+                      // console.error("Error parsing delivery data:", error);
                       return "-";
                     }
                   })()}
@@ -663,7 +663,7 @@ export const useTctSendToServer = ({
         },
       });
     } catch (err) {
-      console.error("Error generating QR code:", err);
+      // console.error("Error generating QR code:", err);
       return null;
     }
   };
@@ -681,12 +681,12 @@ export const useTctSendToServer = ({
 
       // Validate data before proceeding
       if (!Array.isArray(filteredItems) || filteredItems.length === 0) {
-        console.error("Missing submitted data:", filteredItems);
+        // console.error("Missing submitted data:", filteredItems);
         throw new Error("No valid data provided for PDF generation");
       }
 
       if (!poData) {
-        console.error("Missing PO address data");
+        // console.error("Missing PO address data");
         throw new Error("No address data provided for PDF generation");
       }
 
@@ -740,7 +740,7 @@ export const useTctSendToServer = ({
       }
       return false;
     } catch (err) {
-      console.error("Error generating/uploading PDF:", err);
+      // console.error("Error generating/uploading PDF:", err);
       setError(err.message || "Failed to generate PDF");
       return false;
     } finally {

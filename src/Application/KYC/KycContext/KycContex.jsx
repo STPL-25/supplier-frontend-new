@@ -1047,7 +1047,7 @@ if (!uniqueId) {
   const renameFileWithUniqueId = (file, stateKey) => {
     if (!file) return null;
 
-console.log(uniqueId,file.name)
+// console.log(uniqueId,file.name)
     
      // Generates 10-character unique ID
     const fileExtension = file.name.split(".").pop();
@@ -1083,7 +1083,7 @@ console.log(uniqueId,file.name)
     }
   }, [kycFormData.gst]);
 
-  console.log(contactInfo);
+  // console.log(contactInfo);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -1091,7 +1091,7 @@ console.log(uniqueId,file.name)
     if (token) {
       const Securedtoken = decryptToken(token);
       const decodedToken = jwtDecode(Securedtoken);
-      console.log(decodedToken);
+      // console.log(decodedToken);
       const role = decodedToken.role;
       const name = decodedToken.name;
       const companyName = decodedToken.companyName;
@@ -1117,6 +1117,11 @@ console.log(uniqueId,file.name)
       if (role === "SilverHallmark-Supplier") {
         supplierCatagories = "Silver Hallmark";
       }
+      
+      if (role === "Demo-User") {
+        supplierCatagories = "Demo";
+      }
+      // console.log(role)
       setKycFormData((prevState) => ({
         ...prevState,
         companyname: companyName,
@@ -1127,11 +1132,11 @@ console.log(uniqueId,file.name)
     }
   }, []);
 
-  console.log(companyName, userName);
-  console.log(kycFormData);
+  // console.log(companyName, userName);
+  // console.log(kycFormData);
 
   const getFileName = (url) => {
-    console.log(url);
+    // console.log(url);
     return url?.split("/").pop();
   };
 
@@ -1163,7 +1168,7 @@ console.log(uniqueId,file.name)
           token = localStorage.getItem("token");
         };
         if (!token) {
-          console.error("No token found in localStorage");
+          // console.error("No token found in localStorage");
           fetchToken();
           return;
         }
@@ -1176,7 +1181,7 @@ console.log(uniqueId,file.name)
           `${KYC_API}/geteditdata/${companyName}`
         );
         const data = response.data;
-        console.log(data);
+        // console.log(data);
 
         setKycFormData((prevState) => ({
           ...prevState,
@@ -1223,7 +1228,7 @@ console.log(uniqueId,file.name)
           bankaddress: data.bankaddress || prevState.bankaddress,
         }));
 
-        console.log(contactInfo);
+        // console.log(contactInfo);
         setContactInfo((prevState) => ({
           ...prevState,
           owner: data.owner || prevState.owner,
@@ -1282,23 +1287,23 @@ console.log(uniqueId,file.name)
           authPersonFile: data?.authPersonFile?.replace(/^"+|"+$/g, ""),
         });
       } catch (error) {
-        console.error("Error fetching KYC data:", error);
+        // console.error("Error fetching KYC data:", error);
       }
     };
 
     fetchData();
   }, []);
 
-  console.log(fileDatasUrl);
+  // console.log(fileDatasUrl);
 
   const handleInputChange = (event) => {
     const { name, value, type, checked } = event.target;
-    console.log(type, name, value);
+    // console.log(type, name, value);
 
     if (name === "gst") {
-      console.log(value);
+      // console.log(value);
       const panNumber = extractPANFromGST(value);
-      console.log("Extracted PAN:", panNumber);
+      // console.log("Extracted PAN:", panNumber);
 
       setKycFormData((prevState) => ({
         ...prevState,
@@ -1317,7 +1322,7 @@ console.log(uniqueId,file.name)
             : capitalizeValue(value, name),
       }));
       localStorage.setItem("kycData", JSON.stringify(kycFormData));
-      console.log(kycFormData);
+      // console.log(kycFormData);
     }
 
     validate(kycFormData, filesDatas, fileDatasUrl);
@@ -1346,7 +1351,7 @@ console.log(uniqueId,file.name)
         compressedFile = await imageCompression(compressedFile, options);
         quality -= 0.1;
       } catch (error) {
-        console.error("Error compressing image:", error);
+        // console.error("Error compressing image:", error);
         break;
       }
     }
@@ -1382,7 +1387,7 @@ console.log(uniqueId,file.name)
         [name]: (renamedFile.size / 1024).toFixed(2),
       }));
 
-      console.log(`File renamed to: ${renamedFile.name}`);
+      // console.log(`File renamed to: ${renamedFile.name}`);
     }
   };
 
@@ -1492,7 +1497,7 @@ console.log(uniqueId,file.name)
     localStorage.setItem("hallmarkInfo", JSON.stringify(hallmarkInfo));
   };
 
-  console.log(contactInfo);
+  // console.log(contactInfo);
 
   const handleFileDelete = (fileType) => {
     setFilesDatas((prev) => ({ ...prev, [fileType]: null }));
@@ -1510,7 +1515,7 @@ console.log(uniqueId,file.name)
       setTimeout(() => URL.revokeObjectURL(fileURL), 100);
     }
     if (editFile) {
-      console.log(editFile);
+      // console.log(editFile);
       const sanitizedUrl = editFile.replace(/^"(.*)"$/, "$1");
       window.open(sanitizedUrl, "_blank");
     }
@@ -1653,10 +1658,10 @@ console.log(uniqueId,file.name)
       formData.append(key, contactInfo[key]);
     }
 
-    console.log("..................", userRole);
+    // console.log("..................", userRole);
     if (userRole.includes("Hallmark")) {
       for (const key in hallmarkInfo) {
-        console.log(key, hallmarkInfo[key]);
+        // console.log(key, hallmarkInfo[key]);
         formData.append(key, hallmarkInfo[key]);
       }
     }
@@ -1689,9 +1694,9 @@ console.log(uniqueId,file.name)
 
     try {
       for (let pair of formData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
+        // console.log(`${pair[0]}: ${pair[1]}`);
       }
-      console.log(Object.entries(errors));
+      // console.log(Object.entries(errors));
 
       const response = await axios.post(`${KYC_API}/kycpost`, formData, {
         headers: {
@@ -1713,16 +1718,16 @@ console.log(uniqueId,file.name)
         reset();
         return response.data;
       }
-      console.log("Response:", response.data);
+      // console.log("Response:", response.data);
     } catch (error) {
-      console.error("Error submitting form data:", error);
+      // console.error("Error submitting form data:", error);
       setErrorMessage(error.response.data.message);
       setSuccessMsg("");
       return error.response.data;
     }
   };
 
-  console.log(errors);
+  // console.log(errors);
 
   return (
     <KycContext.Provider

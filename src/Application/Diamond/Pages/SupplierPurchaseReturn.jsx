@@ -123,7 +123,7 @@ const ReturnAcceptDialog = ({ isOpen, onClose, onSubmit, rowData }) => {
       setImages([]);
       setPreviewUrls([]);
     } catch (error) {
-      console.error("Error submitting return:", error);
+      // console.error("Error submitting return:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -253,7 +253,7 @@ const RejectDialog = ({ isOpen, onClose, onSubmit, rowData }) => {
       });
       setRejectReason("");
     } catch (error) {
-      console.error("Error submitting rejection:", error);
+      // console.error("Error submitting rejection:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -460,7 +460,7 @@ const SupplierPurchaseReturn = () => {
   };
 
   const handleBulkReturn = (action) => {
-    console.log(selectedRows);
+    // console.log(selectedRows);
     const selectedData = Array.from(selectedRows).map((row) => row);
     setSelectedRow(selectedData);
     if (action === "Accept") setShowReturnDialog(true);
@@ -487,12 +487,12 @@ const SupplierPurchaseReturn = () => {
       const response = await axios.get(
         `${DIA_API}/supplier/purchase_return/SupplierDetails/${user}/${btoa(selectedInvoice)??""}`
       );
-      console.log(response);
+      // console.log(response);
       setData(response.data);
       // Clear selected rows when data changes
       setSelectedRows(new Set());
     } catch (error) {
-      console.error("Error fetching data:", error);
+      // console.error("Error fetching data:", error);
     }
   };
   useEffect(() => {
@@ -505,15 +505,15 @@ const SupplierPurchaseReturn = () => {
       const response = await axios.get(
         `${DIA_API}/supplier/purchase_return/invoices/${user}`
       );
-      console.log("+++++++++++++++++++++++++++++++",response.data);
+      // console.log("+++++++++++++++++++++++++++++++",response.data);
       setInvoices(response.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      // console.error("Error fetching data:", error);
     }
   };
   // Handle return submission
   const handleReturn = async (formData, images, remarks) => {
-    console.log(images, remarks);
+    // console.log(images, remarks);
     try {
      const response= await axios.post(
         `${DIA_API}/supplier/return_purchase/accept_items`,
@@ -539,11 +539,11 @@ const SupplierPurchaseReturn = () => {
       setSelectedRow(null);
       setSelectedRows(new Set()); // Clear selections after successful return
     } catch (error) {
-      console.error("Error processing return:", error);
+      // console.error("Error processing return:", error);
     }
   };
   const handleReject = async (reason,rowData) => {
-    console.log("rowDatarowData",reason,rowData);
+    // console.log("rowDatarowData",reason,rowData);
     try {
       const response=await axios.post(
         `${DIA_API}/supplier/return_purchase/reject_items`,
@@ -565,7 +565,7 @@ const SupplierPurchaseReturn = () => {
       setSelectedRow(null);
       setSelectedRows(new Set()); // Clear selections after successful return
     } catch (error) {
-      console.error("Error processing return:", error);
+      // console.error("Error processing return:", error);
     }
   };
   // Export to Excel
@@ -583,7 +583,7 @@ const SupplierPurchaseReturn = () => {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error("Export failed:", error);
+      // console.error("Export failed:", error);
     }
   };
 

@@ -47,7 +47,7 @@ function FormToCredit() {
         const response = await axios.get(`${API}/getsupplier/rateconfirmation`);
         setSupplierNames(response.data);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchCompanyName();
@@ -103,7 +103,7 @@ function FormToCredit() {
     // console.log(e.target.value)
     const { name, value } = e.target;
     let formattedValue = value;
-console.log(name,value)
+// console.log(name,value)
     // Handle different field validations
     switch (name) {
       case "mobileNumber":

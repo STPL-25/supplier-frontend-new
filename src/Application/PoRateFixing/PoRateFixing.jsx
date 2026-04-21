@@ -3,10 +3,15 @@ import axios from "axios";
 import { API } from "../../config/configData";
 import { DashBoardContext } from "../../DashBoardContext/DashBoardContext";
 import useSnackbar from "../../CustomHook/useSnackbar";
+import { useSendToServer } from "../Gold/components/SendToServer";
 
 function PoRateFixing() {
-  const { user } = useContext(DashBoardContext);
+  const { user, userRole } = useContext(DashBoardContext);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
+
+  const { generatePdf, generatePdfBlobUrl } = useSendToServer({
+    onPdfGenerated: () => {},
+  });
 
   const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState("");
@@ -14,59 +19,66 @@ function PoRateFixing() {
   const [loadingItems, setLoadingItems] = useState(false);
   const [submitting, setSubmitting] = useState({});
 
-  // Group items by poNumber — rate is per PO
   const [poRates, setPoRates] = useState({});
+  const [requestedRates, setRequestedRates] = useState({});
+  const [rateErrors, setRateErrors] = useState({});
+  const [previewPoNumber, setPreviewPoNumber] = useState(null);
+  const [previewBlobUrl, setPreviewBlobUrl] = useState(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
-  // Fetch supplier names
+  const fetchSuppliers = async () => {
+    try {
+      const res = await axios.get(
+        `${API}/gold_Po/find_supplier_name_fix_unfix_po_details/rate_fixing`,
+      );
+      setSuppliers(res.data);
+    } catch {
+      showSnackbar("Failed to fetch suppliers", "error");
+    }
+  };
+
   useEffect(() => {
-    const fetchSuppliers = async () => {
-      try {
-        const res = await axios.get(
-          `${API}/gold_Po/find_supplier_name_fix_unfix_po_details/rate_fixing`
-        );
-        setSuppliers(res.data);
-      } catch (err) {
-        console.error("Error fetching suppliers:", err);
-        showSnackbar("Failed to fetch suppliers", "error");
-      }
-    };
     fetchSuppliers();
   }, []);
 
-  // Fetch PO details when supplier changes
+  const fetchPoDetails = async () => {
+    setLoadingItems(true);
+    try {
+      const res = await axios.get(
+        `${API}/gold_Po/fix_unfix_po_details/rate_fixing/${selectedSupplier}`,
+      );
+      const data = Array.isArray(res.data) ? res.data : [res.data];
+      setPoItems(data);
+
+      const initialRates = {};
+      const initialRequestedRates = {};
+      data.forEach((item) => {
+        const poNum = item.poNumber;
+        if (poNum && !(poNum in initialRates)) {
+          initialRates[poNum] = item.rate && item.rate > 0 ? item.rate : "";
+          initialRequestedRates[poNum] =
+            item.rate && item.rate > 0 ? parseFloat(item.rate) : 0;
+        }
+      });
+      setPoRates(initialRates);
+      setRequestedRates(initialRequestedRates);
+    } catch {
+      showSnackbar("Failed to fetch PO details", "error");
+      setPoItems([]);
+      setPoRates({});
+      setRequestedRates({});
+    } finally {
+      setLoadingItems(false);
+    }
+  };
+
   useEffect(() => {
     if (!selectedSupplier) {
       setPoItems([]);
       setPoRates({});
+      setRequestedRates({});
       return;
     }
-    const fetchPoDetails = async () => {
-      setLoadingItems(true);
-      try {
-        const res = await axios.get(
-          `${API}/gold_Po/fix_unfix_po_details/rate_fixing/${selectedSupplier}`
-        );
-        const data = Array.isArray(res.data) ? res.data : [res.data];
-        setPoItems(data);
-
-        // Pre-fill rate per unique poNumber
-        const initialRates = {};
-        data.forEach((item) => {
-          const poNum = item.poNumber;
-          if (poNum && !(poNum in initialRates)) {
-            initialRates[poNum] = item.rate && item.rate > 0 ? item.rate : "";
-          }
-        });
-        setPoRates(initialRates);
-      } catch (err) {
-        console.error("Error fetching PO details:", err);
-        showSnackbar("Failed to fetch PO details", "error");
-        setPoItems([]);
-        setPoRates({});
-      } finally {
-        setLoadingItems(false);
-      }
-    };
     fetchPoDetails();
   }, [selectedSupplier]);
 
@@ -80,14 +92,59 @@ function PoRateFixing() {
     }
   };
 
-  const handlePoRateChange = (poNumber, value) => {
-    setPoRates((prev) => ({ ...prev, [poNumber]: value }));
+  const getValidRateRange = (poNumber) => {
+    const firstItem = poItems.find((i) => i.poNumber === poNumber);
+    if (!firstItem) return null;
+
+    const metalType = (firstItem.metal_type || "").toLowerCase();
+    const isGold = metalType.includes("gold");
+    const isSilver = metalType.includes("silver");
+
+    const base999Rate = isGold
+      ? parseFloat(firstItem.gold999RateWithGST)
+      : isSilver
+        ? parseFloat(firstItem.silverPureRateWithGST)
+        : null;
+
+    let min = 0;
+    let max = Infinity;
+
+    if (base999Rate && base999Rate > 0) {
+      min = Math.max(min, base999Rate * 0.7);
+      max = Math.min(max, base999Rate * 1.3);
+    }
+
+    const requestedRate = parseFloat(firstItem.requested_rate);
+    if (!isNaN(requestedRate) && requestedRate > 0) {
+      min = Math.max(min, requestedRate * 0.9);
+      max = Math.min(max, requestedRate * 1.1);
+    }
+
+    return { min: Math.round(min * 100) / 100, max: Math.round(max * 100) / 100 };
   };
 
-  // Amount = pure_wt * rate (rate is per PO)
+  const handlePoRateChange = (poNumber, value) => {
+    setPoRates((prev) => ({ ...prev, [poNumber]: value }));
+
+    const numVal = parseFloat(value);
+    if (value === "" || isNaN(numVal)) {
+      setRateErrors((prev) => ({ ...prev, [poNumber]: null }));
+      return;
+    }
+
+    const range = getValidRateRange(poNumber);
+    if (range && (numVal < range.min || numVal > range.max)) {
+      setRateErrors((prev) => ({
+        ...prev,
+        [poNumber]: `Value should be between ${fmt(range.min)} and ${fmt(range.max)}`,
+      }));
+    } else {
+      setRateErrors((prev) => ({ ...prev, [poNumber]: null }));
+    }
+  };
+
   const calcAmount = (item) => {
-    const poNum = item.poNumber;
-    const rate = parseFloat(poRates[poNum]);
+    const rate = parseFloat(poRates[item.poNumber]);
     const pureWt = parseFloat(item.pure_wt);
     if (!isNaN(rate) && rate > 0 && !isNaN(pureWt) && pureWt > 0) {
       return pureWt * rate;
@@ -95,7 +152,18 @@ function PoRateFixing() {
     return 0;
   };
 
-  // Group items by poNumber for rendering rate input once per PO
+  // Derive all rates from pure rate with GST (3% GST assumed)
+  const calcRates = (poNumber) => {
+    const pureRateWithGst = parseFloat(poRates[poNumber]);
+    if (!pureRateWithGst || pureRateWithGst <= 0) return null;
+    const rate100 = pureRateWithGst / 1.03;   // 100% rate without GST
+    const rate995 = rate100 * 0.995;           // 995 rate without GST
+    const rate999 = rate100 * 0.999;           // 999 rate without GST
+    const gst100 = rate100 * 0.03;             // 100% GST amount
+    const gst995 = rate995 * 0.03;             // 995 GST amount
+    return { rate100, rate995, rate999, gst100, gst995 };
+  };
+
   const groupedByPo = poItems.reduce((acc, item) => {
     const poNum = item.poNumber || "UNKNOWN";
     if (!acc[poNum]) acc[poNum] = [];
@@ -103,7 +171,6 @@ function PoRateFixing() {
     return acc;
   }, {});
 
-  // Totals across all items
   const totals = poItems.reduce(
     (acc, item) => {
       acc.pieces += parseInt(item.pieces ?? 0) || 0;
@@ -111,17 +178,21 @@ function PoRateFixing() {
       acc.amount += calcAmount(item);
       return acc;
     },
-    { pieces: 0, pureWt: 0, amount: 0 }
+    { pieces: 0, pureWt: 0, amount: 0 },
   );
 
   const buildPoPayload = (poNumber) => {
     const rate = parseFloat(poRates[poNumber]);
+    const rates = calcRates(poNumber);
     const itemsForPo = groupedByPo[poNumber] || [];
     const totalQty = itemsForPo.reduce(
       (sum, item) => sum + (parseInt(item.pieces ?? 0) || 0),
-      0
+      0,
     );
-    const totalAmount = itemsForPo.reduce((sum, item) => sum + calcAmount(item), 0);
+    const totalAmount = itemsForPo.reduce(
+      (sum, item) => sum + calcAmount(item),
+      0,
+    );
     const type = itemsForPo[0]?.type || "";
     const firstItem = itemsForPo[0];
     const poDate = firstItem
@@ -130,12 +201,96 @@ function PoRateFixing() {
     return {
       poNumber,
       poDate,
-      rate,
+      rate,                                // pure rate with GST (entered)
+      rate100: rates?.rate100 ?? 0,        // 100% rate without GST
+      rate995: rates?.rate995 ?? 0,        // 995 rate without GST
+      rate999: rates?.rate999 ?? 0,        // 999 rate without GST
+      gst100Amount: rates?.gst100 ?? 0,    // 100% GST amount
+      gst995Amount: rates?.gst995 ?? 0,    // 995 GST amount
       totalQty,
       totalAmount,
       type,
       user,
     };
+  };
+
+  const sendPoAfterSuccess = async (res, poNumber) => {
+    if (poNumber.includes("TCT")) return;
+
+    let filteredItems = res.data?.findPoDatas;
+    let poData = res.data?.poData;
+    let orderTypes = res.data?.orderTypes;
+    let poType = res.data?.poType;
+
+    if (!filteredItems || !poData) {
+      try {
+        const pdfRes = await axios.post(`${API}/gold_po/fetch_po_creation/accounts`, {
+          userRole: userRole,
+          selectedSupplier,
+          selectedPoNumber: poNumber,
+         
+        });
+        filteredItems = pdfRes.data?.data;
+        poData = pdfRes.data?.address;
+        orderTypes = pdfRes.data?.orderTypes;
+        poType = groupedByPo[poNumber]?.[0]?.type || "fix";
+      } catch {
+        return;
+      }
+    }
+
+    if (filteredItems && filteredItems.length > 0 && poData) {
+      await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
+    }
+  };
+
+  const openPreview = async (poNumber) => {
+    setPreviewPoNumber(poNumber);
+    setPreviewBlobUrl(null);
+    setPreviewLoading(true);
+    try {
+      let filteredItems = null;
+      let poData = null;
+      let orderTypes = null;
+
+      for (const status of ["Pending", "Accepted", ""]) {
+        try {
+          const pdfRes = await axios.post(`${API}/gold_po/fetch_po_creation/accounts`, {
+            selectedSupplier,
+            selectedPoNumber: poNumber,
+          
+          });
+          if (pdfRes.data?.data?.length > 0 && pdfRes.data?.address) {
+            filteredItems = pdfRes.data.data;
+            poData = pdfRes.data.address;
+            orderTypes = pdfRes.data.orderTypes;
+            break;
+          }
+        } catch {
+          // try next status
+        }
+      }
+
+      if (filteredItems && filteredItems.length > 0 && poData) {
+        const enteredRate = parseFloat(poRates[poNumber]);
+        filteredItems = filteredItems.map((item) => ({
+          ...item,
+          rate: enteredRate || item.rate,
+        }));
+        const url = await generatePdfBlobUrl(filteredItems, poData, orderTypes);
+        setPreviewBlobUrl(url);
+      }
+    } catch {
+      showSnackbar("Failed to load PDF preview", "error");
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  const closePreview = () => {
+    if (previewBlobUrl) URL.revokeObjectURL(previewBlobUrl);
+    setPreviewBlobUrl(null);
+    setPreviewPoNumber(null);
   };
 
   const handleSubmit = async (poNumber) => {
@@ -144,14 +299,25 @@ function PoRateFixing() {
       showSnackbar("Please enter a valid rate", "error");
       return;
     }
+    if (rateErrors[poNumber]) {
+      showSnackbar(rateErrors[poNumber], "error");
+      return;
+    }
 
     setSubmitting((prev) => ({ ...prev, [poNumber]: true }));
 
     try {
-      await axios.post(`${API}/gold_Po/update_rate_fixing`, buildPoPayload(poNumber));
+      const res = await axios.post(
+        `${API}/gold_Po/update_rate_fixing`,
+        buildPoPayload(poNumber),
+      );
       showSnackbar(`Rate updated for PO ${poNumber}`, "success");
-    } catch (err) {
-      console.error("Error submitting rate:", err);
+      if (res.status === 200) {
+        await sendPoAfterSuccess(res, poNumber);
+        fetchSuppliers();
+        fetchPoDetails();
+      }
+    } catch {
       showSnackbar("Failed to update rate", "error");
     } finally {
       setSubmitting((prev) => ({ ...prev, [poNumber]: false }));
@@ -172,14 +338,16 @@ function PoRateFixing() {
     poNumbers.forEach((poNum) => (allSubmitting[poNum] = true));
     setSubmitting(allSubmitting);
     try {
-      await Promise.all(
+      const results = await Promise.all(
         poNumbers.map((poNum) =>
-          axios.post(`${API}/gold_Po/update_rate_fixing`, buildPoPayload(poNum))
-        )
+          axios.post(`${API}/gold_Po/update_rate_fixing`, buildPoPayload(poNum)),
+        ),
       );
       showSnackbar("All rates updated successfully", "success");
-    } catch (err) {
-      console.error("Error submitting all rates:", err);
+      await Promise.all(
+        results.map((res, idx) => sendPoAfterSuccess(res, poNumbers[idx])),
+      );
+    } catch {
       showSnackbar("Failed to update some rates", "error");
     } finally {
       setSubmitting({});
@@ -188,10 +356,24 @@ function PoRateFixing() {
 
   const poNumbers = Object.keys(groupedByPo);
 
+  const handlePreviewSubmit = async (poNumber) => {
+    closePreview();
+    await handleSubmit(poNumber);
+  };
+
+  const fmt = (val, decimals = 2) =>
+    val != null && !isNaN(val)
+      ? `₹${parseFloat(val).toLocaleString("en-IN", {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals,
+        })}`
+      : "—";
+
+  // Columns: #, Product, PO#, PO Date, Qty, Pure Wt, Type,
+  //          Req Rate, Pure Rate w/GST, 100% Rate, 995 Rate,
+  //          995 GST Amt, 100% GST Amt, 999 Rate, Amount, Action  → 16 total
   return (
     <div className="w-full max-w-full p-4">
-
-      {/* ── Snackbar ── */}
       {snackbar?.open && (
         <div
           className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white text-sm transition-all duration-300 ${
@@ -208,7 +390,6 @@ function PoRateFixing() {
         </div>
       )}
 
-      {/* ── Header ── */}
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           PO Rate Fixing
@@ -232,7 +413,6 @@ function PoRateFixing() {
         </div>
       </div>
 
-      {/* ── PO Table ── */}
       {selectedSupplier && (
         <div className="bg-white rounded-lg shadow-md overflow-x-auto">
           {loadingItems ? (
@@ -266,44 +446,37 @@ function PoRateFixing() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    #
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Product
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    PO Number
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    PO Date
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Qty (Pcs)
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Pure Wt (g)
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Rate (₹/g)
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Amount (₹)
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Action
-                  </th>
+                  {[
+                    "#",
+                    "Product",
+                    "PO Number",
+                    "PO Date",
+                    "Qty (Pcs)",
+                    "Pure Wt (g)",
+                    "Type",
+                    "Req. Rate (₹/g)",
+                    "Pure Rate w/ GST",
+                    "Amount (₹)",
+                    "Action",
+                  ].map((h, i) => (
+                    <th
+                      key={i}
+                      className={`px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap ${
+                        i >= 4 ? "text-right" : "text-left"
+                      } ${i === 6 || i === 7 || i === 8 || i === 10 ? "text-center" : ""}`}
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {poNumbers.map((poNumber) => {
                   const items = groupedByPo[poNumber];
                   const rate = poRates[poNumber];
+                  const rates = calcRates(poNumber);
+                  const reqRate = requestedRates[poNumber];
 
-                  // Sub-totals for this PO group
                   const poTotals = items.reduce(
                     (acc, item) => {
                       acc.pieces += parseInt(item.pieces ?? 0) || 0;
@@ -311,7 +484,7 @@ function PoRateFixing() {
                       acc.amount += calcAmount(item);
                       return acc;
                     },
-                    { pieces: 0, pureWt: 0, amount: 0 }
+                    { pieces: 0, pureWt: 0, amount: 0 },
                   );
 
                   return items.map((item, itemIdx) => {
@@ -331,8 +504,9 @@ function PoRateFixing() {
                               : ""
                           }`}
                         >
-                          <td className="px-4 py-3 text-gray-500">{sno}</td>
-                          <td className="px-4 py-3">
+                          {/* cols 1-7: per-item */}
+                          <td className="px-3 py-3 text-gray-500">{sno}</td>
+                          <td className="px-3 py-3">
                             <div className="font-medium text-gray-800">
                               {item.product_name}
                             </div>
@@ -340,19 +514,19 @@ function PoRateFixing() {
                               {item.product}
                             </div>
                           </td>
-                          <td className="px-4 py-3 font-mono text-gray-700">
+                          <td className="px-3 py-3 font-mono text-gray-700">
                             {item.poNumber || poDetails.poNumber || "—"}
                           </td>
-                          <td className="px-4 py-3 text-gray-600">
+                          <td className="px-3 py-3 text-gray-600">
                             {poDetails.poDate || item.poDate || "—"}
                           </td>
-                          <td className="px-4 py-3 text-right text-gray-700">
+                          <td className="px-3 py-3 text-right text-gray-700">
                             {item.pieces ?? "—"}
                           </td>
-                          <td className="px-4 py-3 text-right text-gray-700">
+                          <td className="px-3 py-3 text-right text-gray-700">
                             {parseFloat(item.pure_wt ?? 0).toFixed(3)}
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-3 py-3 text-center">
                             <span
                               className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${
                                 item.type === "fix"
@@ -364,53 +538,81 @@ function PoRateFixing() {
                             </span>
                           </td>
 
-                          {/* Rate input only on first row of each PO group */}
-                          {isFirstInGroup ? (
+                          {/* cols 8-16: per-PO (rowSpan) */}
+                          {isFirstInGroup && (
                             <td
-                              className="px-4 py-3 text-center"
+                              className="px-3 py-3 text-right font-medium text-gray-700 bg-amber-50"
                               rowSpan={items.length}
                             >
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={rate ?? ""}
-                                onChange={(e) =>
-                                  handlePoRateChange(poNumber, e.target.value)
-                                }
-                                className="w-28 text-right p-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter rate"
-                              />
+                              {reqRate > 0 ? fmt(reqRate) : "—"}
                             </td>
-                          ) : null}
+                          )}
 
-                          <td className="px-4 py-3 text-right font-medium text-gray-800">
-                            {amount > 0
-                              ? `₹${amount.toLocaleString("en-IN", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                })}`
-                              : "—"}
+                          {isFirstInGroup && (() => {
+                            const rateRange = getValidRateRange(poNumber);
+                            return (
+                              <td
+                                className="px-3 py-3 text-center"
+                                rowSpan={items.length}
+                              >
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={rate ?? ""}
+                                  onChange={(e) =>
+                                    handlePoRateChange(poNumber, e.target.value)
+                                  }
+                                  className={`w-28 text-right p-1.5 border rounded-md focus:outline-none focus:ring-2 ${
+                                    rateErrors[poNumber]
+                                      ? "border-red-400 focus:ring-red-400"
+                                      : "border-gray-300 focus:ring-blue-500"
+                                  }`}
+                                  placeholder="Enter rate"
+                                />
+                                {rateErrors[poNumber] ? (
+                                  <div className="text-xs text-red-500 mt-0.5 w-28 text-left leading-tight">
+                                    {rateErrors[poNumber]}
+                                  </div>
+                                ) : rateRange ? (
+                                  <div className="text-xs text-gray-400 mt-0.5">
+                                    {fmt(rateRange.min)} – {fmt(rateRange.max)}
+                                  </div>
+                                ) : null}
+                              </td>
+                            );
+                          })()}
+
+                          <td className="px-3 py-3 text-right font-medium text-gray-800">
+                            {amount > 0 ? fmt(amount) : "—"}
                           </td>
 
-                          {/* Action button only on first row of each PO group */}
-                          {isFirstInGroup ? (
+                          {isFirstInGroup && (
                             <td
-                              className="px-4 py-3 text-center"
+                              className="px-3 py-3 text-center"
                               rowSpan={items.length}
                             >
                               <button
-                                onClick={() => handleSubmit(poNumber)}
+                                onClick={() => {
+                                  const rate = parseFloat(poRates[poNumber]);
+                                  if (!rate || rate <= 0) {
+                                    showSnackbar("Please enter a valid rate", "error");
+                                    return;
+                                  }
+                                  if (rateErrors[poNumber]) {
+                                    showSnackbar(rateErrors[poNumber], "error");
+                                    return;
+                                  }
+                                  openPreview(poNumber);
+                                }}
                                 disabled={submitting[poNumber]}
-                                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-xs font-semibold rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
-                                {submitting[poNumber] ? "Saving..." : "Submit"}
+                                {submitting[poNumber] ? "Saving..." : "Preview & Submit"}
                               </button>
                             </td>
-                          ) : null}
+                          )}
                         </tr>
 
-                        {/* PO Sub-total row — shown after last item in group when multiple items */}
                         {isLastInGroup && items.length > 1 && (
                           <tr
                             key={`${poNumber}-subtotal`}
@@ -418,27 +620,22 @@ function PoRateFixing() {
                           >
                             <td
                               colSpan={4}
-                              className="px-4 py-2 text-right uppercase tracking-wide"
+                              className="px-3 py-2 text-right uppercase tracking-wide"
                             >
                               PO Subtotal — {poNumber}
                             </td>
-                            <td className="px-4 py-2 text-right">
+                            <td className="px-3 py-2 text-right">
                               {poTotals.pieces}
                             </td>
-                            <td className="px-4 py-2 text-right">
+                            <td className="px-3 py-2 text-right">
                               {poTotals.pureWt.toFixed(3)}
                             </td>
-                            <td className="px-4 py-2" />
-                            <td className="px-4 py-2" />
-                            <td className="px-4 py-2 text-right">
-                              {poTotals.amount > 0
-                                ? `₹${poTotals.amount.toLocaleString("en-IN", {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}`
-                                : "—"}
+                            {/* Type, ReqRate, PureRate = 3 cols */}
+                            <td colSpan={3} className="px-3 py-2" />
+                            <td className="px-3 py-2 text-right">
+                              {poTotals.amount > 0 ? fmt(poTotals.amount) : "—"}
                             </td>
-                            <td className="px-4 py-2" />
+                            <td className="px-3 py-2" />
                           </tr>
                         )}
                       </>
@@ -447,34 +644,28 @@ function PoRateFixing() {
                 })}
               </tbody>
 
-              {/* ── Grand Total Row ── */}
               <tfoot>
                 <tr className="bg-gray-100 border-t-2 border-gray-300 font-bold text-sm">
                   <td
                     colSpan={4}
-                    className="px-4 py-3 text-right text-gray-700 uppercase tracking-wide text-xs"
+                    className="px-3 py-3 text-right text-gray-700 uppercase tracking-wide text-xs"
                   >
                     Grand Total ({poItems.length} item
                     {poItems.length !== 1 ? "s" : ""} / {poNumbers.length} PO
                     {poNumbers.length !== 1 ? "s" : ""})
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-800">
+                  <td className="px-3 py-3 text-right text-gray-800">
                     {totals.pieces}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-800">
+                  <td className="px-3 py-3 text-right text-gray-800">
                     {totals.pureWt.toFixed(3)}
                   </td>
-                  <td className="px-4 py-3" />
-                  <td className="px-4 py-3" />
-                  <td className="px-4 py-3 text-right text-gray-800">
-                    {totals.amount > 0
-                      ? `₹${totals.amount.toLocaleString("en-IN", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}`
-                      : "—"}
+                  {/* Type, ReqRate, PureRate = 3 cols */}
+                  <td colSpan={3} className="px-3 py-3" />
+                  <td className="px-3 py-3 text-right text-gray-800">
+                    {totals.amount > 0 ? fmt(totals.amount) : "—"}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-3 py-3 text-center">
                     {poNumbers.length > 1 && (
                       <button
                         onClick={handleSubmitAll}
@@ -491,6 +682,69 @@ function PoRateFixing() {
               </tfoot>
             </table>
           )}
+        </div>
+      )}
+
+      {/* PDF Preview Modal */}
+      {previewPoNumber && previewPoNumber !== "__ALL__" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-xl shadow-2xl flex flex-col"
+               style={{ width: "min(860px, 95vw)", height: "min(92vh, 900px)" }}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b shrink-0">
+              <h3 className="text-sm font-semibold text-gray-800">
+                PO Preview — {previewPoNumber}
+              </h3>
+              <button
+                onClick={closePreview}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* PDF area */}
+            <div className="flex-1 overflow-hidden bg-gray-100 relative">
+              {previewLoading && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gray-50">
+                  <svg className="animate-spin h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  <span className="text-sm text-gray-500">Generating PDF preview...</span>
+                </div>
+              )}
+              {!previewLoading && !previewBlobUrl && (
+                <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-400">
+                  Preview unavailable
+                </div>
+              )}
+              {!previewLoading && previewBlobUrl && (
+                <iframe
+                  src={previewBlobUrl}
+                  className="w-full h-full border-0"
+                  title="PO Preview"
+                />
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-5 py-3 border-t bg-gray-50 shrink-0">
+              <button
+                onClick={closePreview}
+                className="px-5 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handlePreviewSubmit(previewPoNumber)}
+                disabled={previewLoading}
+                className="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Confirm & Submit
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -723,7 +723,7 @@ export default function MetalTransferReport() {
         );
         setData(response.data || []);
       } catch (error) {
-        console.error("Failed to fetch data:", error);
+        // console.error("Failed to fetch data:", error);
       } finally {
         setIsLoading(false);
       }

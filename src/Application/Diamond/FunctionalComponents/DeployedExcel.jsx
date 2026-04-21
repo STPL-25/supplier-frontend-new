@@ -3224,7 +3224,7 @@ const DiamondManager = () => {
         const res = await axios.post(`${DIA_API}/suppliers/kyc_details`, { SupplierName: user });
         setSuppliers(res.data);
       } catch (err) {
-        console.error('Error fetching suppliers:', err);
+        // console.error('Error fetching suppliers:', err);
       }
     };
     fetchSuppliers();
@@ -3609,7 +3609,7 @@ const DiamondManager = () => {
           fileInputRef.current.value = '';
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
         setUploadStatus({ type: 'error', message: 'Error reading file — check format' });
         setDataTypeErrors([]);
         setValidationErrors([]);
@@ -3627,7 +3627,7 @@ const DiamondManager = () => {
       setUploadStatus({ type: 'success', message: '✓ Data saved successfully!' });
       setTimeout(() => resetForm(), 1500);
     } catch (error) {
-      console.error('Save error:', error);
+      // console.error('Save error:', error);
       const errorMsg = error.response?.data?.result || error.message || 'Error saving data!';
       setUploadStatus({ type: 'error', message: `✗ ${errorMsg}` });
     } finally {

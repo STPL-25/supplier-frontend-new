@@ -26,12 +26,12 @@ function KycViewAccepted() {
 
     // Fetch KYC data
     const fetchKycData = async () => {
-        console.log(supplierDetails, userRole)
+        // console.log(supplierDetails, userRole)
         try {
             if (supplierDetails && userRole) {
                 const encodedUserRole = btoa("Accepted")
                 const response = await axios.get(`${KYC_API}/gettingkycdetails/${supplierDetails}/${encodedUserRole}`);
-                console.log(response.data);
+                // console.log(response.data);
                 setDatas(response.data);
                 if (response.data.length > 0) {
                     setSupplierId(response.data[0].id);
@@ -59,7 +59,7 @@ function KycViewAccepted() {
             // Set success message (optional, since fetching supplier names might be routine)
             return response.data; // Assuming this returns an array of supplier names
         } catch (error) {
-            console.error("Error fetching supplier names:", error);
+            // console.error("Error fetching supplier names:", error);
             throw new Error("Failed to fetch supplier names.");
         }
     };
@@ -68,7 +68,7 @@ function KycViewAccepted() {
         queryKey: ['supplierNames'], // Add dynamic keys if userRole changes
         queryFn: () => fetchSupplierNames(userRole), // Pass userRole dynamically
         onError: (error) => {
-            console.error("Error in useQuery:", error.message); // Log for debugging
+            // console.error("Error in useQuery:", error.message); // Log for debugging
             setErrorMsg(error.message); // Assuming setErrorMsg updates UI state
             setSnackbarSeverity("error"); // Adjust Snackbar UI to error state
             setOpenSnackbar(true); // Display the error Snackbar
@@ -107,7 +107,7 @@ function KycViewAccepted() {
          });
    
 
-    console.log(supplierDetails);
+    // console.log(supplierDetails);
 
     return (
         <Card className="h-full w-full p-6" style={{ width: "100%" }}>

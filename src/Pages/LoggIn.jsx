@@ -45,7 +45,7 @@ const { mutate, isLoading, isError, isSuccess, error } = useMutation({
     // Decode and set user info
     const securedToken = decryptToken(data.token);
     const decodedToken = jwtDecode(securedToken);
-    console.log(decodedToken);
+    // console.log(decodedToken);
 
     if (decodedToken.role === "Diamond-Supplier") {
       setUser(decodedToken.companyName);
@@ -59,7 +59,7 @@ const { mutate, isLoading, isError, isSuccess, error } = useMutation({
     setIsLoggin(true);
   },
 });
-console.log(user)
+// console.log(user)
 
 useEffect(() => {
   let interval;
@@ -104,7 +104,7 @@ const handleGenerateOtp = async () => {
     try {
       setTimer(300); // Set to 5 minutes
       const response = await axios.get(`${LOGG_API}/loginotp/${login.MobileNo}`);
-      console.log(response.data);
+      // console.log(response.data);
       if(response.status === 200){
         setIsOtpClicked(true);
         toast.success('OTP sent successfully!'); // Display OTP success message

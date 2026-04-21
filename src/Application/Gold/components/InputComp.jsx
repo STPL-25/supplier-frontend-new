@@ -15,7 +15,7 @@ const CustomSelect = ({ options, value, onChange, label, error }) => {
           value={value?.value || ""}
           onChange={(e) => {
             const selected = options.find((opt) => opt.value == e.target.value);
-            console.log(e.target.value);
+            // console.log(e.target.value);
             onChange(selected);
           }}
           className={`
@@ -190,7 +190,7 @@ const PhotoCapture = React.forwardRef(
           videoRef.current.srcObject = stream;
         }
       } catch (err) {
-        console.error("Error accessing camera:", err);
+        // console.error("Error accessing camera:", err);
         // alert("Unable to access camera. Please upload instead.");
         showSnackbar("Unable to access camera. Please upload instead.","warning")
         setCameraActive(false);
@@ -244,7 +244,7 @@ const PhotoCapture = React.forwardRef(
                 onPhotoCapture(file, photoData, setCapturedImage);
               }
             } else {
-              console.error("Failed to create blob from canvas");
+              // console.error("Failed to create blob from canvas");
             }
           },
           "image/jpeg",
@@ -252,7 +252,7 @@ const PhotoCapture = React.forwardRef(
         );
         stopCamera();
       } catch (err) {
-        console.error("Error capturing photo:", err);
+        // console.error("Error capturing photo:", err);
       }
       setIsCapturing(false);
     }, [onPhotoCapture, stopCamera]);
@@ -571,8 +571,8 @@ const ProductTypeSelection = ({formData,setFormData,selectedTypes, setSelectedTy
     }
     
     // Log to verify our logic is working
-    console.log("Selected types:", selectedTypes);
-    console.log("Setting product type to:", productType);
+    // console.log("Selected types:", selectedTypes);
+    // console.log("Setting product type to:", productType);
     
   }, [selectedTypes, setFormData]);
 

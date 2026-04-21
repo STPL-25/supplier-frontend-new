@@ -41,8 +41,8 @@ function PoConsolidateReport() {
 
   const { generatePdf, isGenerating, errors } = useSendToServer({
     onPdfGenerated: (pdfFile) => {
-      console.log(pdfFile);
-      console.log("PDF generated successfully");
+      // console.log(pdfFile);
+      // console.log("PDF generated successfully");
     },
   });
 
@@ -71,7 +71,7 @@ function PoConsolidateReport() {
         );
         setSuppliers(response.data.supplierNames);
       } catch (error) {
-        console.error("Error fetching supplier and PO details:", error);
+        // console.error("Error fetching supplier and PO details:", error);
         showSnackbar("Failed to fetch suppliers", "error");
       }
     };
@@ -86,7 +86,7 @@ function PoConsolidateReport() {
         );
         setPoNumbers(response.data.filteredData.poNumbers);
       } catch (error) {
-        console.error("Error fetching supplier and PO details:", error);
+        // console.error("Error fetching supplier and PO details:", error);
         showSnackbar("Failed to fetch PO numbers", "error");
       }
     };
@@ -137,7 +137,7 @@ function PoConsolidateReport() {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error fetching PO creation details:", error);
+      // console.error("Error fetching PO creation details:", error);
       showSnackbar("No Data Found", "error");
       setError(error.message);
       setFilteredData([]);

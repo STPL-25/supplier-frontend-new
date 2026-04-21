@@ -22,7 +22,7 @@ function DT() {
     useEffect(() => {
         const fetchShapes = async () => {
             const response = await axios.get(`${DIA_API}/diashape/${user}`)
-            console.log(response)
+            // console.log(response)
             setDiaShapes(response.data)
         }
         fetchShapes()
@@ -110,7 +110,7 @@ function DT() {
                 const diaRate = newData[index].diaRate;
                 if (diaRate === 0) {
                     // If diaRate is 0, set an error
-                    console.log(errors)
+                    // console.log(errors)
                     setErrors((prevErrors) => ({
                         ...prevErrors,
                         [`diaRate_${index}`]: "Dia rate not found",
@@ -126,7 +126,7 @@ function DT() {
     };
 
     const handleDelete = (index) => {
-        console.log(index, totalDiamondData)
+        // console.log(index, totalDiamondData)
         setTotalDiamondData(prevData => prevData.filter((_, i) => i !== index));
     };
 const handleNavigateToMasterPage=()=>{

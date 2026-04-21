@@ -30,7 +30,7 @@ function SupplierIndReport() {
   const { mobileNo } = useContext(RateContext);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  console.log(API);
+  // console.log(API);
   useEffect(() => {
     fetchData();
   }, [mobileNo]);
@@ -40,7 +40,7 @@ function SupplierIndReport() {
       const response = await axios.get(`${API}/supreport/${mobileNo}`);
       setDatas(response.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      // console.error("Error fetching data:", error);
     }
   };
 

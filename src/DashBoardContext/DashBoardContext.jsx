@@ -26,15 +26,15 @@ const DashBoardContextProvider = ({ children }) => {
     const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
     return decryptedToken;
   };
-  console.log(logginToken);
+  // console.log(logginToken);
  
  const fetchSupplierData = async (companyname) => {
   try {
      const supplierData = await axios.get(`${LOGG_API}/get_supplier_details/${companyname}`);
-  console.log("supplier",supplierData)
+  // console.log("supplier",supplierData)
   return supplierData;
   } catch (error) {
-    console.log(error)
+    // console.log(error)
   }
  
  }
@@ -53,7 +53,7 @@ const DashBoardContextProvider = ({ children }) => {
           const setSignCatagorys = decodedToken.signUpCatagory;
           const managerRoleData=decodedToken.roleData
           let supplierData
-          console.log("companyName",companyName)
+          // console.log("companyName",companyName)
           if(companyName){
            supplierData = await fetchSupplierData(companyName);
           }
@@ -66,13 +66,13 @@ const DashBoardContextProvider = ({ children }) => {
           setMobileNo(decodedToken.MobileNo);
           setRoleData(managerRoleData)
         } catch (error) {
-          console.error("Error initializing user:", error);
+          // console.error("Error initializing user:", error);
         }
       }
     };
     initializeUser();
   }, [logginToken, tokens]);
-  console.log(companyName, names, userRole,roleData);
+  // console.log(companyName, names, userRole,roleData);
   const handleLogOut = async () => {
     try {
       const tokens = localStorage.getItem("token");
@@ -87,14 +87,14 @@ const DashBoardContextProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
   const [activeSection, setActiveSection] = useState(() => {
     const storedSection = localStorage.getItem("activeSection");
     return storedSection;
   });
-console.log(names);
+// console.log(names);
   return (
     <DashBoardContext.Provider
       value={{

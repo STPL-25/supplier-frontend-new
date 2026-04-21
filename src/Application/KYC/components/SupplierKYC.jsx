@@ -788,7 +788,7 @@ function SupplierKYC() {
             Suppcode:supCodeResponse?.data?.data?.suppCode
           }))
         }
-        console.log(supCodeResponse)
+        // console.log(supCodeResponse)
         const gstData = response.data;
 
         // Check if GST is active
@@ -881,9 +881,9 @@ function SupplierKYC() {
         });
 
         setGstVerified(true);
-        console.log("GST data fetched and form updated successfully");
+        // console.log("GST data fetched and form updated successfully");
       } catch (error) {
-        console.error("GST API Error:", error);
+        // console.error("GST API Error:", error);
           setKycFormData((prevData) => ({
             ...prevData,
             pan: "",
@@ -921,7 +921,7 @@ function SupplierKYC() {
 
     fetchGstData();
   }, [kycFormData?.gst]);
-console.log(kycFormData)
+// console.log(kycFormData)
   // Original PAN extraction effect
   useEffect(() => {
     if (kycFormData.gst && kycFormData.gst.length > 0 && !gstVerified) {
@@ -942,7 +942,7 @@ console.log(kycFormData)
 
   const handleValidate = () => {
     const validationErrors = validate(kycFormData, filesDatas, fileDatasUrl);
-    console.log(validationErrors);
+    // console.log(validationErrors);
 
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -957,14 +957,14 @@ console.log(kycFormData)
       localStorage.setItem("kycData", JSON.stringify(kycFormData));
       setActiveComponent("Principal Address");
     } else {
-      console.log("Form has errors. Cannot proceed to next section.");
+      // console.log("Form has errors. Cannot proceed to next section.");
     }
   };
 
   const handleInputChangeWithValidation = (event) => {
     handleInputChange(event);
     const { name, value } = event.target;
-    console.log(name, value);
+    // console.log(name, value);
 
     const fieldErrors = validate(
       { ...kycFormData, [name]: value },
@@ -1134,6 +1134,26 @@ console.log(kycFormData)
                       </label>
                     </div>
                   )}
+                  {kycFormData.supplierCategory === "Demo" && (
+                    <div className="flex items-center">
+                      <input
+                        id="Demo"
+                        name="supplierCategory"
+                        type="radio"
+                        value="Demo"
+                        checked={kycFormData.supplierCategory === "Demo"}
+                        className={`h-4 w-4 text-black border-black focus:ring-black ${
+                          errors.supplierCategory ? "border-red-500" : ""
+                        }`}
+                      />
+                      <label
+                        htmlFor="Demo"
+                        className="ml-2 text-xs sm:text-sm text-black whitespace-nowrap"
+                      >
+                        Demo Supplier
+                      </label>
+                    </div>
+                  )}
                 </div>
                 {errors.supplierCategory && (
                   <p className="text-red-500 text-xs sm:text-sm mt-1">
@@ -1141,7 +1161,7 @@ console.log(kycFormData)
                   </p>
                 )}
               </div>
-
+{console.log(kycFormData.supplierCategory)}
               {/* GST */}
               <div className="mb-6">
                 <label className="mb-2 block text-sm sm:text-base font-medium text-black">

@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(xargs perl:*)",
+      "Bash(xargs -0 perl -i -pe 's/^\\(\\\\s*\\)\\(?!\\\\/\\\\/\\)console\\\\.\\(log|error|warn|info|debug\\)/$1\\\\/\\\\/ console.$2/g')"
     ]
   }
 }

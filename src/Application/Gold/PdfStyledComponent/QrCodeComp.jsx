@@ -28,7 +28,7 @@ const QRCodeComponent = ({ value }) => {
           });
           setQrDataURL(url);
         } catch (err) {
-          console.error("Error generating QR code:", err);
+          // console.error("Error generating QR code:", err);
         }
       };
   

@@ -157,7 +157,7 @@ const RatesChart = () => {
         setError(null);
       } catch (error) {
         setError('Failed to fetch rate data. Please try again later.');
-        console.error('Error fetching retail rates:', error);
+        // console.error('Error fetching retail rates:', error);
       } finally {
         setIsLoading(false);
       }

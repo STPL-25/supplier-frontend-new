@@ -24,10 +24,16 @@ import GoogleSheetsPurchaseManager from "../Application/Diamond/FunctionalCompon
 // import PurchaseReport from "../Application/Diamond/FunctionalComponents/DiaPurchaseReport";
 import PurchaseReport from "../Application/DiamondPurEntry/components/DiaPurReport";
 import DebitCreditNotePage from "../Application/DebitNoteAndCreditNote/DebitCreditNotePage";
+import SupplierDebitCreditView from "../Application/DebitNoteAndCreditNote/SupplierDebitCreditView";
+import DebitCreditReport from "../Application/DebitNoteAndCreditNote/DebitCreditReport";
 // import SupPurchaseReport from "../Application/Diamond/FunctionalComponents/DiaSupPurchaseReport";
 import SupPurchaseReport from "../Application/DiamondPurEntry/components/SupReport";
 import QCCheckReport from "../Application/DiamondPurEntry/components/QCCheckReport";
 import DiamondQuotationForm from "../Application/DiamondQuotationMaster/Pages/DiamondQuotationForm";
+import DemoKycPurchaseApproval from "../Application/KYC/pages/DemoKycPurchaseApproval";
+import DemoKycAcManagerApproval from "../Application/KYC/pages/DemoKycAcApproval";
+import DemoKycAprovalMis from "../Application/KYC/pages/DemoKycAprovalMis";
+import PoRateFixingReport from "../Application/PoRateFixing/PoRateFixingReport";
 // ✅ Use these direct references instead
 const adminIcon = "/images/admin.png";
 const masterApprovalIcon = "/images/approval.png";
@@ -92,6 +98,7 @@ import PoConsolidateReport from "../Application/Gold/pages/PoConsolidateReport";
 import RetailRates from "../Application/RetailRates/RetailRates";
 import DiamondQuotationApproval from "../Application/DiamondQuotationMaster/Pages/DiamondQuotationApproval";
 import PoRateFixing from "../Application/PoRateFixing/PoRateFixing";
+import CustomerOrderDetails from "../Application/CustomerOrder/CustomerOrderDetails";
 // import ChildPoTct from "../Application/Gold/components/ChildPoTct";
 export {
   DiamondMasterPage,
@@ -176,7 +183,14 @@ export {
   QCCheckReport,
   DiamondQuotationForm,
   DiamondQuotationApproval,
-  PoRateFixing
+  PoRateFixing,
+  CustomerOrderDetails,
+  DemoKycPurchaseApproval,
+  DemoKycAcManagerApproval,
+  DemoKycAprovalMis,
+  SupplierDebitCreditView,
+  DebitCreditReport,
+  PoRateFixingReport
   // ChildPoTct
   // SupplierOrder
 };

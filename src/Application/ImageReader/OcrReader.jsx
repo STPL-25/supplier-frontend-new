@@ -146,7 +146,7 @@ function OcrReader() {
       
       URL.revokeObjectURL(imageUrl);
     } catch (error) {
-      console.error('OCR Error:', error);
+      // console.error('OCR Error:', error);
       alert('Failed to extract text from image');
     } finally {
       setIsProcessing(false);
@@ -181,7 +181,7 @@ function OcrReader() {
           
           setIsProcessing(false);
         } catch (error) {
-          console.error('PDF Processing Error:', error);
+          // console.error('PDF Processing Error:', error);
           alert('Failed to extract text from PDF');
           setIsProcessing(false);
         }
@@ -189,7 +189,7 @@ function OcrReader() {
       
       fileReader.readAsArrayBuffer(selectedFile);
     } catch (error) {
-      console.error('PDF Error:', error);
+      // console.error('PDF Error:', error);
       alert('Failed to extract text from PDF');
       setIsProcessing(false);
     }
@@ -215,7 +215,7 @@ function OcrReader() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
+    // console.log('Form Data:', formData);
     alert('Form submitted! Check console for data.');
   };
 

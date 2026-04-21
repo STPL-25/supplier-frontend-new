@@ -339,7 +339,7 @@ const DiamondProvider = ({ children }) => {
         navigate("/mainpage");
       }
     } catch (error) {
-      console.error("Error saving data:", error);
+      // console.error("Error saving data:", error);
     }
   };
 

@@ -82,7 +82,7 @@ const DebitCreditNotePage = () => {
       initReasonsData(activeReasons);
       toast.success(`${activeReasons.length} reasons loaded`);
     } catch (error) {
-      console.error('Error fetching reasons:', error);
+      // console.error('Error fetching reasons:', error);
       toast.error('Failed to load reasons. Using defaults.');
       const defaultReasons = [
         { id: 1, key: 'rateDifference',   title: 'Rate Difference',    description: 'Price variation adjustment',          isAutoDebit: false },
@@ -108,7 +108,7 @@ const DebitCreditNotePage = () => {
       setFilteredInvoices(invoices);
       toast.success(`${invoices.length} invoices loaded`);
     } catch (error) {
-      console.error('Error fetching invoices:', error);
+      // console.error('Error fetching invoices:', error);
       toast.error('Failed to load invoices.');
       setInvoiceList([]);
       setFilteredInvoices([]);
@@ -472,7 +472,7 @@ const DebitCreditNotePage = () => {
       });
       handleReset();
     } catch (error) {
-      console.error('Submission error:', error);
+      // console.error('Submission error:', error);
       toast.error(error.response?.data?.message || 'Failed to submit. Please try again.');
     } finally {
       setIsSubmitting(false);

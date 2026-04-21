@@ -66,7 +66,7 @@ function SalesReportChart() {
         
         setData(responseData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
         setError(error.message || 'Failed to fetch data');
       } finally {
         setLoading(false);

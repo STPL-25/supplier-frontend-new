@@ -49,14 +49,14 @@ const [diaRate,setDiaRate]=useState(null)
     
         // Extract the necessary fields from the updated data
         const { carat, diamondShape,numberOfStones } = newData[index];
-    console.log(carat/numberOfStones)
+    // console.log(carat/numberOfStones)
         // Perform the asynchronous operation (API call) to get the diamond rate
         try {
             const response = await axios.get(`${API}/diamondRate_masterData/${inputFields.RefNo}/${carat/numberOfStones}/${diamondShape}`);
-            console.log(response);
+            // console.log(response);
     
             // Assuming response contains the necessary rate data
-          console.log(response.data[0])
+          // console.log(response.data[0])
             const diaRate = response.data[0]?.DPCCNTRTE; // Adjust based on actual response structure
     
             // Calculate diaValue and diaWt based on the updated diaRate
@@ -65,13 +65,13 @@ const [diaRate,setDiaRate]=useState(null)
             newData[index].diaWt = (carat * 0.2).toFixed(3);
             
         } catch (error) {
-            console.error("Error fetching diamond rate:", error);
+            // console.error("Error fetching diamond rate:", error);
             // Handle error (e.g., set an error state, display a message, etc.)
         }
     
         // Update the state with the new data
         setTotalDiamondData(newData);
-        console.log(newData);
+        // console.log(newData);
     };
     
 

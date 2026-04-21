@@ -30,7 +30,7 @@ function MasterApproval() {
                 const response = await axios.put(`${DIA_API}/suppliername/masterapproval`);
                 setSupplierNames(response.data);
             } catch (error) {
-                console.error("Error fetching supplier names:", error);
+                // console.error("Error fetching supplier names:", error);
                 toast.error("Failed to fetch supplier names.");
             }
         };
@@ -46,7 +46,7 @@ function MasterApproval() {
             const response = await axios.put(`${DIA_API}/fetchmasterapprovaldata`, { selectedSupplier });
             setFetchDatas(response.data);
         } catch (error) {
-            console.error("Error fetching master approval data:", error);
+            // console.error("Error fetching master approval data:", error);
             toast.error("Failed to fetch approval data.");
         }
     };
@@ -54,11 +54,11 @@ function MasterApproval() {
     const handleAccept = async (id) => {
         try {
             const response = await axios.put(`${DIA_API}/action/${id}/accept`);
-            console.log(response.data);
+            // console.log(response.data);
             toast.success("Supplier accepted successfully.");
             fetchData();
         } catch (error) {
-            console.error("Error performing accept action:", error);
+            // console.error("Error performing accept action:", error);
             toast.error("Failed to accept supplier.");
         }
     };
@@ -82,12 +82,12 @@ function MasterApproval() {
         }
         try {
             const response = await axios.put(`${DIA_API}/action/${currentRejectId}/reject`, { reason: rejectReason });
-            console.log(response.data);
+            // console.log(response.data);
             toast.success("Supplier rejected successfully.");
             handleRejectClose();
             fetchData();
         } catch (error) {
-            console.error("Error performing reject action:", error);
+            // console.error("Error performing reject action:", error);
             toast.error("Failed to reject supplier.");
         }
     };

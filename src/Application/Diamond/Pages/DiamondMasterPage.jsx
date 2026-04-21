@@ -51,7 +51,7 @@ function DiamondMasterPage() {
       setRejectedList(fetchDatas.filter((list) => list.Status === "R"));
       setFileData(fetchDatas);
     } catch (error) {
-      console.error("Error fetching master data:", error);
+      // console.error("Error fetching master data:", error);
     }
   };
 
@@ -117,7 +117,7 @@ function DiamondMasterPage() {
         }
       }
     } catch (error) {
-      console.error("Error submitting data:", error);
+      // console.error("Error submitting data:", error);
 
       // Provide better error message handling
       const errorMessage =
@@ -169,7 +169,7 @@ function DiamondMasterPage() {
         toast.info("Item deleted successfully!");
       }
     } catch (error) {
-      console.error("Error deleting data:", error);
+      // console.error("Error deleting data:", error);
       toast.error("Error deleting item!");
     }
   };

@@ -42,10 +42,10 @@ const DiamondProductForm = () => {
 
   const [meltingOptions, setMeltingOptions] = useState([]);
 
-  console.log(isCompressing);
+  // console.log(isCompressing);
 
   const [filteredSubmittedData, setFilteredSubmittedData] = useState([]);
-  console.log(filteredSubmittedData);
+  // console.log(filteredSubmittedData);
 
   const photoCaptureRef = useRef(null);
 
@@ -57,10 +57,10 @@ const DiamondProductForm = () => {
             formData?.productType ?? ""
           }`
         );
-        console.log("...........................", response.data);
+        // console.log("...........................", response.data);
         setProductDetails(response.data);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchProductDetails();
@@ -74,12 +74,12 @@ const DiamondProductForm = () => {
         );
         setMeltingOptions(response.data);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchMeltingDetails();
   }, [userRole]);
-  console.log(formData?.productType);
+  // console.log(formData?.productType);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -135,9 +135,9 @@ const DiamondProductForm = () => {
         // Get the size of the compressed image in KB
         const compressedSizeKB = (compressedImage.size / 1024).toFixed(2);
 
-        console.log(
+        // console.log(
           `Original image: ${originalSizeKB} KB, Compressed: ${compressedSizeKB} KB`
-        );
+       
 
         // Optional: Show compression result to user
         // showSnackbar(`Image compressed from ${originalSizeKB}KB to ${compressedSizeKB}KB`, "success");
@@ -153,7 +153,7 @@ const DiamondProductForm = () => {
         }));
       }
     } catch (error) {
-      console.error("Error compressing image:", error);
+      // console.error("Error compressing image:", error);
       // showSnackbar("Failed to process image", "error");
       // Fallback to uncompressed image if compression fails
       setFormData((prev) => ({
@@ -161,6 +161,7 @@ const DiamondProductForm = () => {
         photo: file,
       }));
     }
+  
   };
   const handleSelect = (itemId, orderType) => {
     setSelectedItems((prev) => {
@@ -174,7 +175,7 @@ const DiamondProductForm = () => {
 
   const handleEdit = (event) => {
     const data = event;
-    console.log("Edit data:", data);
+    // console.log("Edit data:", data);
 
     // Find the product details
     const productData = productDetails.find(
@@ -229,20 +230,20 @@ const DiamondProductForm = () => {
 
   const handleDelete = async (id) => {
     try {
-      console.log(id);
+      // console.log(id);
       const response = await axios.put(`${API}/gold_po/delete/${id}`);
       if (response.status === 200) {
         fetchPoUserDetails();
         showSnackbar("Product deleted successfully!", "error");
       }
     } catch (error) {
-      console.error("Error deleting record:", error);
+      // console.error("Error deleting record:", error);
       showSnackbar("Failed to delete product", "error");
     }
   };
 
   const handlePoSubmit = async (poData) => {
-    console.log(poData);
+    // console.log(poData);
     try {
       const filteredItems = submittedData.filter((item) =>
         selectedItems.includes(item.sno)
@@ -255,7 +256,7 @@ const DiamondProductForm = () => {
       const orderTypes = [
         ...new Set(filteredItems.map((data) => data.orderType)),
       ];
-      console.log(filteredItems);
+      // console.log(filteredItems);
       // Set the filtered data and PO address data for the PDF generation
       setFilteredSubmittedData(filteredItems);
       setPoAddressData(poData);
@@ -274,7 +275,7 @@ const DiamondProductForm = () => {
           items: selectedItems,
           poDetails: poData,
         };
-        console.log(submitDataForUpdate);
+        // console.log(submitDataForUpdate);
 
         const response = await axios.put(
           `${API}/gold_po/update_po_records/${userRole}/${user}`,
@@ -289,7 +290,7 @@ const DiamondProductForm = () => {
         }
       }
     } catch (error) {
-      console.error("Error submitting PO:", error);
+      // console.error("Error submitting PO:", error);
       showSnackbar(error.message || "Failed to submit Purchase Order", "error");
     }
   };
@@ -301,7 +302,7 @@ const DiamondProductForm = () => {
       );
       setSubmittedData(response.data);
     } catch (error) {
-      console.error("Error fetching PO details:", error);
+      // console.error("Error fetching PO details:", error);
     }
   };
 
@@ -354,7 +355,7 @@ const DiamondProductForm = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  console.log(formData.productWeightage);
+  // console.log(formData.productWeightage);
   const handleSubmit = async () => {
     // Validate form before submission
     if (!validateForm()) {
@@ -367,7 +368,7 @@ const DiamondProductForm = () => {
 
     // Append all form fields to FormData
     Object.keys(formData).forEach((key) => {
-      console.log(formData["productType"]);
+      // console.log(formData["productType"]);
       if (key === "photo" && formData[key]) {
         formDataToSubmit.append("photo", formData[key]);
       } else if (key === "product" && formData[key]) {
@@ -381,14 +382,14 @@ const DiamondProductForm = () => {
       } else if (key === "productType" && formData[key]) {
         formDataToSubmit.append(key, formData[key] ?? "GO");
       } else if (formData[key] !== null && formData[key] !== undefined) {
-        console.log(key, formData[key]);
+        // console.log(key, formData[key]);
         formDataToSubmit.append(key, formData[key]);
       }
     });
-    console.log(selectedTypes);
+    // console.log(selectedTypes);
     // Always append metal_type
     for (let pair of formDataToSubmit.entries()) {
-      console.log(pair[0], pair[1]);
+      // console.log(pair[0], pair[1]);
     }
     try {
       const response = await axios.post(
@@ -447,7 +448,7 @@ const DiamondProductForm = () => {
         error.response?.data?.message || "Failed to add product",
         "error"
       );
-      console.error("Error submitting form:", error);
+      // console.error("Error submitting form:", error);
     }
   };
 
@@ -456,7 +457,7 @@ const DiamondProductForm = () => {
     fetchPoUserDetails();
   }, []);
   useEffect(() => {
-    console.log("Selected types changed:", selectedTypes);
+    // console.log("Selected types changed:", selectedTypes);
     // You can add additional logic here if needed when selectedTypes changes
   }, [selectedTypes]);
 

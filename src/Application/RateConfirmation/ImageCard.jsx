@@ -35,10 +35,10 @@ function ImageCard() {
 
   const fetchData = async () => {
     const response = await axios.get(`${API}/imageData/${Id}`);
-    console.log(response.data);
+    // console.log(response.data);
     setImageData({ ...response.data });
   };
-  console.log(imageData);
+  // console.log(imageData);
   useEffect(() => {
     if (
       imageData.supDebit != null &&
@@ -66,9 +66,9 @@ function ImageCard() {
     imageData.KTMCredit,
   ]);
 
-  console.log(updatedImageData);
-  console.log(value);
-  console.log(status);
+  // console.log(updatedImageData);
+  // console.log(value);
+  // console.log(status);
 
   const handleImageAccept = (event, img, id, index) => {
     if (value === "KtmDebit") {
@@ -172,10 +172,10 @@ function ImageCard() {
         value: "SupCredit",
       };
     }
-    console.log(ImageData);
+    // console.log(ImageData);
     try {
       const response = await axios.post(`${API}/post-supdebit-img`, ImageData);
-      console.log(response.data);
+      // console.log(response.data);
       if(response.status===200){
         setTimeout(()=>{
           window.location.reload()
@@ -198,15 +198,15 @@ function ImageCard() {
   //       return { backgroundColor: "#ecfeff" };
   //   }
   // };
-  console.log(rejectedSupDebitImg)
-  console.log('Accepted Sup Credit Images:', acceptedSupCreditImg);
-    console.log('Accepted Sup Debit Images:', acceptedSupDebitImg);
-    console.log('Accepted Ktm Credit Images:', acceptedKtmCreditImg);
-    console.log('Accepted Ktm Debit Images:', acceptedKtmDebitImg);
+  // console.log(rejectedSupDebitImg)
+  // console.log('Accepted Sup Credit Images:', acceptedSupCreditImg);
+    // console.log('Accepted Sup Debit Images:', acceptedSupDebitImg);
+    // console.log('Accepted Ktm Credit Images:', acceptedKtmCreditImg);
+    // console.log('Accepted Ktm Debit Images:', acceptedKtmDebitImg);
    const handleImageCancel=()=>{
     window.location.reload()
    } 
-   console.log(user,companyName,names,mobileNo)
+   // console.log(user,companyName,names,mobileNo)
   return (
     <>
       {status === "no" || status === "sno" ? (

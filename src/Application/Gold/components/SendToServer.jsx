@@ -117,7 +117,12 @@ const POPage = ({
   const parsedMoment = moment(approvedTime);
   const dateOnly = parsedMoment.format("YYYY-MM-DD"); // e.g., "2025-03-31"
   const timeOnly = parsedMoment.format("HH:mm:ss"); // e.g., "17:15:44"
-  const type=data[0].type;
+  // console.log(data)
+  const type = data[0].type
+  const rate = data[0].rate;
+  const rateTypeLabel = type === "fix" ? "Fixed Rate" : type === "unfix" ? "Unfixed Rate" : type || "-";
+  const typeHeader = data[0].type === "fix" ? `Fixed Rate - ${data[0].rate} (Pure Rate with GST)` : data[0].type === "unfix" ? `Unfixed Rate - ${data[0].rate}` : data[0].type;
+
   return (
     <Page size="A4" style={styles.page}>
       {/* {console.log(orderTypes)} */}
@@ -167,6 +172,9 @@ const POPage = ({
               </Text>
             </View>
           </View>
+            <View style={styles.poInfo}>
+              <Text style={styles.poInfoText}>{typeHeader}</Text>
+              </View>
         </>
       )}
       {/* From and To Section */}
@@ -369,6 +377,8 @@ const POPage = ({
         </View>
       )}
 
+   
+
       {/* Products Table */}
       <View style={styles.table}>
         <View style={styles.tableHeader}>
@@ -376,7 +386,7 @@ const POPage = ({
             <>
             {col.header==='Rate'?
             <View key={index} style={[styles.tableCell, { width: col.width }]}>
-              <Text style={styles.tableHeaderCell}>{`${type} ${col.header}`}</Text>
+              <Text style={styles.tableHeaderCell}>{`${type} ${col.header} (INR)`}</Text>
             </View>:
             <View key={index} style={[styles.tableCell, { width: col.width }]}>
               <Text style={styles.tableHeaderCell}>{col.header}</Text>
@@ -571,7 +581,7 @@ const PODocument = ({
 }) => {
   // Ensure submittedData is an array
   const dataArray = Array.isArray(submittedData) ? submittedData : [];
-  console.log(submittedData);
+  // console.log(submittedData);
   // Group data by PO number
   const groupedData = dataArray.reduce((acc, item) => {
     const poNumber = item.poNumber || "default";
@@ -643,7 +653,28 @@ export const useSendToServer = ({
         },
       });
     } catch (err) {
-      console.error("Error generating QR code:", err);
+      // console.error("Error generating QR code:", err);
+      return null;
+    }
+  };
+
+  const generatePdfBlobUrl = async (filteredItems, poData, orderTypes) => {
+    try {
+      if (!Array.isArray(filteredItems) || filteredItems.length === 0) return null;
+      if (!poData) return null;
+      const qrCodeDataURL = await generateQRCodeDataURL(
+        poData?.poDetails?.poNumber || "Unknown PO"
+      );
+      const doc = (
+        <PODocument
+          submittedData={filteredItems}
+          poAddressData={{ ...poData, qrCodeDataURL }}
+          orderTypes={orderTypes}
+        />
+      );
+      const blob = await pdf(doc).toBlob();
+      return URL.createObjectURL(blob);
+    } catch {
       return null;
     }
   };
@@ -651,10 +682,10 @@ export const useSendToServer = ({
   const generatePdf = async (
     filteredItems,
     poData,
-    
+
     orderTypes,
     poType,
-    
+
   ) => {
     try {
       setIsGenerating(true);
@@ -663,12 +694,12 @@ export const useSendToServer = ({
 
       // Validate data before proceeding
       if (!Array.isArray(filteredItems) || filteredItems.length === 0) {
-        console.error("Missing submitted data:", filteredItems);
+        // console.error("Missing submitted data:", filteredItems);
         throw new Error("No valid data provided for PDF generation");
       }
 
       if (!poData) {
-        console.error("Missing PO address data");
+        // console.error("Missing PO address data");
         throw new Error("No address data provided for PDF generation");
       }
       const qrCodeDataURL = await generateQRCodeDataURL(
@@ -747,7 +778,7 @@ export const useSendToServer = ({
       } 
       return false;
     } catch (err) {
-      console.error("Error generating/uploading PDF:", err);
+      // console.error("Error generating/uploading PDF:", err);
       setError(err.message || "Failed to generate PDF");
       return false;
     } finally {
@@ -755,7 +786,7 @@ export const useSendToServer = ({
     }
   };
 
-  return { generatePdf, error, isGenerating };
+  return { generatePdf, generatePdfBlobUrl, error, isGenerating };
 };
 
 

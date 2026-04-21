@@ -28,7 +28,7 @@ function Combine() {
   const rotateImage = () => {
     setIsImageRotated(true);
   };
-  console.log("combine grid")
+  // console.log("combine grid")
   return (
     <div>
       <div style={{ display: "flex", flexDirection: "row" }}>
@@ -124,11 +124,11 @@ export default Combine;
 const handleEditRow = (index) => {
   // 1. Select the specific row data by index
   const selectedRow = rows[index];
-  console.log(selectedRow);
+  // console.log(selectedRow);
 
   // 2. Handle potential errors gracefully
   if (!selectedRow) {
-    console.error("Invalid row index provided. Please check your input.");
+    // console.error("Invalid row index provided. Please check your input.");
     return; // Exit the function if no valid row is found
   }
 
@@ -160,7 +160,7 @@ const handleEditRow = (index) => {
       setclrStn(true)
     }
   } catch (error) {
-    console.error("Error processing diamond/color stone data:", error);
+    // console.error("Error processing diamond/color stone data:", error);
     // Handle the error appropriately, e.g., display an error message to the user
     return; // Optionally, exit the function if the error is critical
   }

@@ -36,9 +36,9 @@ function SupplierReport1() {
         try {
             const res = await axios.put(`${DIA_API}/submittedData`,{supplierNames,filterData});
             setRows(res.data);
-            console.log(res.data)
+            // console.log(res.data)
         } catch (error) {
-            console.log(error)
+            // console.log(error)
         }
      
     };

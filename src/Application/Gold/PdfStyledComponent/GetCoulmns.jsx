@@ -261,7 +261,7 @@
 
 export const getColumns = (data) => {
     // Guard clause for empty data
-    console.log(data)
+    // console.log(data)
     if (!data || data.length === 0) {
         return [];
     }
@@ -407,20 +407,28 @@ export const getColumns = (data) => {
                 return (parseFloat(rowData.net_weight) *parseFloat(rowData.wastage) ) / 100;
             }
         },
-        { 
-            width: "7%", 
-            field: "makingCharges", 
-            header: "MC %" 
+        {
+            width: "7%",
+            field: "makingCharges",
+            header: "MC %"
         },
-        { 
-            width: "7%", 
-            field: "pure_wt", 
-            header: "Fine Wt" 
+        {
+            width: "7%",
+            field: "mcWt",
+            header: "MC Wt",
+            body: (rowData) => {
+                return (parseFloat(rowData.net_weight) * parseFloat(rowData.makingCharges)) / 100;
+            }
         },
-        { 
-            width: "8%", 
-            field: "product_image", 
-            header: "Images" 
+        {
+            width: "7%",
+            field: "pure_wt",
+            header: "Fine Wt"
+        },
+        {
+            width: "8%",
+            field: "product_image",
+            header: "Images"
         }
     ];
 
@@ -507,23 +515,31 @@ export const getColumns = (data) => {
                 return (parseFloat(rowData.net_weight) *parseFloat(rowData.wastage) ) / 100;
             }
         },
-        { 
-            width: "7%", 
-            field: "makingCharges", 
-            header: "MC %" 
+        {
+            width: "7%",
+            field: "makingCharges",
+            header: "MC %"
         },
-        { 
-            width: "7%", 
-            field: "pure_wt", 
-            header: "Fine Wt" 
+        {
+            width: "7%",
+            field: "mcWt",
+            header: "MC Wt",
+            body: (rowData) => {
+                return (parseFloat(rowData.net_weight) * parseFloat(rowData.makingCharges)) / 100;
+            }
         },
-        { 
-            width: "8%", 
-            field: "product_image", 
-            header: "Images" 
+        {
+            width: "7%",
+            field: "pure_wt",
+            header: "Fine Wt"
+        },
+        {
+            width: "8%",
+            field: "product_image",
+            header: "Images"
         }
     ];
-    
+
     // Define specialized columns for gold-diamond-platinum items
     const goldPlatinumDiamondColumns = [
         { 
@@ -597,20 +613,28 @@ export const getColumns = (data) => {
                 return (parseFloat(rowData.net_weight) *parseFloat(rowData.wastage) ) / 100;
             }
         },
-        { 
-            width: "7%", 
-            field: "makingCharges", 
-            header: "MC %" 
+        {
+            width: "7%",
+            field: "makingCharges",
+            header: "MC %"
         },
-         { 
-            width: "10%", 
-            field: "rate", 
-            header: "Rate" 
+        {
+            width: "7%",
+            field: "mcWt",
+            header: "MC Wt",
+            body: (rowData) => {
+                return (parseFloat(rowData.net_weight) * parseFloat(rowData.makingCharges)) / 100;
+            }
         },
-        { 
-            width: "10%", 
-            field: "product_image", 
-            header: "Images" 
+        {
+            width: "10%",
+            field: "rate",
+            header: "Rate"
+        },
+        {
+            width: "10%",
+            field: "product_image",
+            header: "Images"
         }
     ];
 
@@ -682,23 +706,31 @@ export const getColumns = (data) => {
                 return (parseFloat(rowData.net_weight) * parseFloat(rowData.wastage)) / 100;
             }
         },
-        { 
-            width: "7%", 
-            field: "makingCharges", 
-            header: "MC %" 
+        {
+            width: "7%",
+            field: "makingCharges",
+            header: "MC %"
         },
-         { 
-            width: "10%", 
-            field: "rate", 
-            header: "Rate" 
+        {
+            width: "7%",
+            field: "mcWt",
+            header: "MC Wt",
+            body: (rowData) => {
+                return (parseFloat(rowData.net_weight) * parseFloat(rowData.makingCharges)) / 100;
+            }
         },
-        { 
-            width: "10%", 
-            field: "product_image", 
-            header: "Images" 
+        {
+            width: "10%",
+            field: "rate",
+            header: "Rate"
+        },
+        {
+            width: "10%",
+            field: "product_image",
+            header: "Images"
         }
     ];
-    
+
     // The product name column to insert when needed
     const productNameColumn = {
         width: "8%",

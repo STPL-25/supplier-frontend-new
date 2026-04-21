@@ -463,7 +463,7 @@ const DiamondAdmin = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [selectedDiamonds, setSelectedDiamonds] = useState(null);
   const { userRole } = useContext(DashBoardContext);
-  console.log(data)
+  // console.log(data)
   
   const columns = [
     { id: 'sno', label: 'S.No', type: 'number' },
@@ -573,7 +573,7 @@ const DiamondAdmin = () => {
 
   // Calculate totals
   const totals = data.reduce((acc, row) => {
-    console.log(acc, row)
+    // console.log(acc, row)
     columns.forEach(col => {
       if (col.type === 'number' && col.id !== 'sno') {
         acc[col.id] = (acc[col.id] || 0) + (Number(row[col.id]) || 0);
@@ -589,7 +589,7 @@ const DiamondAdmin = () => {
         const response = await axios.get(`${DIA_API}/supplierNames`);
         setSuppliers(response.data.filter(Boolean));
       } catch (error) {
-        console.error('Error fetching suppliers:', error);
+        // console.error('Error fetching suppliers:', error);
       }
     };
     fetchSuppliers();
@@ -603,7 +603,7 @@ const DiamondAdmin = () => {
         const response = await axios.get(`${DIA_API}/submitted/SupplierDetails/${selectedSupplier}`);
         setData(response.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
       }
     };
     fetchData();
@@ -629,7 +629,7 @@ const DiamondAdmin = () => {
       setRejectReason('');
       setSelectedId(null);
     } catch (error) {
-      console.error('Error processing action:', error);
+      // console.error('Error processing action:', error);
     }
   };
 
@@ -648,7 +648,7 @@ const DiamondAdmin = () => {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Export failed:', error);
+      // console.error('Export failed:', error);
     }
   };
 

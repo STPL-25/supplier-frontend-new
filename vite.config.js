@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 4000,
-    allowedHosts: ["supp.spacetextiles.net"],
+    allowedHosts: ["supp.spacetextiles.net","uat.spacetextiles.net"],
   },
   plugins: [react()],
   resolve: {

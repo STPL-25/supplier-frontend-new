@@ -7,31 +7,31 @@ import { DashBoardContext } from "../../../DashBoardContext/DashBoardContext";
 
 // ADD AXIOS INTERCEPTOR FOR DEBUGGING
 axios.interceptors.request.use(request => {
-  console.log('🚀 Starting Request:', {
-    url: request.url,
-    method: request.method,
-    data: request.data,
-    params: request.params
-  });
+  // console.log('🚀 Starting Request:', {
+  //   url: request.url,
+  //   method: request.method,
+  //   data: request.data,
+  //   params: request.params
+  // });
   return request;
 }, error => {
-  console.error('❌ Request Error:', error);
+  // console.error('❌ Request Error:', error);
   return Promise.reject(error);
 });
 
 axios.interceptors.response.use(response => {
-  console.log('✅ Response:', {
-    status: response.status,
-    data: response.data,
-    url: response.config.url
-  });
+  // console.log('✅ Response:', {
+  //   status: response.status,
+  //   data: response.data,
+  //   url: response.config.url
+  // });
   return response;
 }, error => {
-  console.error('❌ Response Error:', {
-    status: error.response?.status,
-    data: error.response?.data,
-    message: error.message
-  });
+  // console.error('❌ Response Error:', {
+  //   status: error.response?.status,
+  //   data: error.response?.data,
+  //   message: error.message
+  // });
   return Promise.reject(error);
 });
 
@@ -50,32 +50,32 @@ function GoldPoCreationSupplier() {
   useEffect(() => {
     const fetchPoDetails = async () => {
       if (!user || !userRole) {
-        console.warn('⚠️ Missing user or userRole:', { user, userRole });
+        // console.warn('⚠️ Missing user or userRole:', { user, userRole });
         return;
       }
 
       setIsLoadingPoNumbers(true);
       try {
-        console.log('📞 Fetching PO Numbers for:', { user, userRole });
+        // console.log('📞 Fetching PO Numbers for:', { user, userRole });
         
         const response = await axios.get(
           `${API}/gold_po/fetch_po_number/${user}/${userRole}/Accepted`
         );
         
-        console.log("📦 Full PO Numbers Response:", response.data);
+        // console.log("📦 Full PO Numbers Response:", response.data);
         
         // Access nested structure
         const poNumbersArray = response.data?.filteredData?.poNumbers || [];
         
-        console.log("✨ Extracted PO Numbers:", poNumbersArray);
+        // console.log("✨ Extracted PO Numbers:", poNumbersArray);
         
         setPoNumbers(Array.isArray(poNumbersArray) ? poNumbersArray : []);
       } catch (error) {
-        console.error("❌ Error fetching PO details:", {
-          message: error.message,
-          response: error.response?.data,
-          status: error.response?.status
-        });
+        // console.error("❌ Error fetching PO details:", {
+        //   message: error.message,
+        //   response: error.response?.data,
+        //   status: error.response?.status
+        // });
         setPoNumbers([]);
         setError("Failed to fetch PO numbers. Please try again.");
       } finally {
@@ -89,7 +89,7 @@ function GoldPoCreationSupplier() {
   // Fetch PO Creation Details
   const fetchPoCreationDetails = async () => {
     if (!selectedPoNumber || !user) {
-      console.warn('⚠️ Missing required data:', { selectedPoNumber, user });
+      // console.warn('⚠️ Missing required data:', { selectedPoNumber, user });
       return;
     }
 
@@ -104,21 +104,21 @@ function GoldPoCreationSupplier() {
         userRole: userRole // Add userRole to the payload
       };
       
-      console.log('📤 Sending PO Creation Request:', requestPayload);
+      // console.log('📤 Sending PO Creation Request:', requestPayload);
 
       const response = await axios.post(
         `${API}/gold_po/fetch_po_creation`, 
         requestPayload
       );
 
-      console.log("📦 Full PO Creation Response:", response.data);
+      // console.log("📦 Full PO Creation Response:", response.data);
 
       if (response.status === 200 && response.data) {
         const addressData = response.data.address || {};
         const poCreationData = response.data.data || [];
 
-        console.log("📍 Address Data:", addressData);
-        console.log("📋 PO Creation Data:", poCreationData);
+        // console.log("📍 Address Data:", addressData);
+        // console.log("📋 PO Creation Data:", poCreationData);
 
         setFilteredData(Array.isArray(poCreationData) ? poCreationData : []);
         setPoAddressData(addressData);
@@ -126,11 +126,11 @@ function GoldPoCreationSupplier() {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
     } catch (error) {
-      console.error("❌ Error fetching PO creation details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
+      // console.error("❌ Error fetching PO creation details:", {
+      //   message: error.message,
+      //   response: error.response?.data,
+      //   status: error.response?.status
+      // });
       
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.error || 
@@ -155,7 +155,7 @@ function GoldPoCreationSupplier() {
 
   const handlePoNumberChange = (event) => {
     const value = event.target.value;
-    console.log('🔄 PO Number changed to:', value);
+    // console.log('🔄 PO Number changed to:', value);
     setSelectedPoNumber(value);
     setError(null);
   };

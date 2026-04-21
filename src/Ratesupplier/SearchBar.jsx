@@ -54,7 +54,7 @@ const SearchBar = () => {
       }
     } catch (error) {
       setMobileError(true);
-      console.error("Error fetching data:", error);
+      // console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
@@ -74,7 +74,7 @@ const SearchBar = () => {
 
   const handleAccept = async (supplierId, img) => {
     try {
-      console.log(supplierId, img)
+      // console.log(supplierId, img)
             
               const response=  await axios.put(
                 `${API}/imagesaccepted/accept`,{supplierId,img});
@@ -92,7 +92,7 @@ const SearchBar = () => {
             
       
           } catch (error) {
-            console.error("Error accepting image:", error);
+            // console.error("Error accepting image:", error);
           }
   };
   const handleReject = (supplierId) => {
@@ -131,10 +131,10 @@ const SearchBar = () => {
                 }, 5000);
       
             } else {
-              console.error("Unexpected response status:", response.status);
+              // console.error("Unexpected response status:", response.status);
             }
           } catch (error) {
-            console.error("Error submitting reject reason:", error);
+            // console.error("Error submitting reject reason:", error);
           }
     // setShowRejectPopup(false);
     // setRejectReason('');

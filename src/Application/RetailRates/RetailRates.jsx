@@ -24,7 +24,7 @@ function RetailRates() {
         mobileNo:mobileNo,
     });
 
-    console.log("User Context in Retail Rates:", mobileNo);
+    // console.log("User Context in Retail Rates:", mobileNo);
     // const ChartAPI = "http://localhost:8080";
     // const ChartAPI="https://cust.spacetextiles.net"
     const [errors, setErrors] = useState({});
@@ -66,7 +66,7 @@ function RetailRates() {
                 }});
             setPreRates(response.data);
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             toast.error("Error fetching past rates");
         }
     };
@@ -102,7 +102,7 @@ function RetailRates() {
                 });
             }
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             toast.error(error.response?.data?.message || "Error submitting data");
         }
     };
@@ -174,10 +174,10 @@ function RetailRates() {
                     username: "spacetextilesltd",
                     password: "F2nFpKS5cUXIPvFS4i9H5EzAjt3sdluYObgNfPTMTpo=",
                 }});
-            console.log(response.data);
+            // console.log(response.data);
             setIsOtpModalOpen(true);  // Show OTP modal on successful OTP generation
         } catch (error) {
-            console.log(error);
+            // console.log(error);
         }
     };
 

@@ -321,7 +321,7 @@ const GoldProductForm = () => {
         const response = await axios.get(`${API}/gold_Po/fetch_all_supplier_for_po/${userRole}`);
         setSupplierOptions(response?.data?.supplierDatas);
       } catch (error) {
-        console.error("Error fetching suppliers:", error);
+        // console.error("Error fetching suppliers:", error);
       }
     };
     fetchSuppliers();
@@ -425,7 +425,7 @@ const GoldProductForm = () => {
         }));
         
       } catch (error) {
-        console.error("Error fetching product details:", error);
+        // console.error("Error fetching product details:", error);
         showSnackbar("Failed to fetch product details", "error");
       }
     };
@@ -502,7 +502,7 @@ const GoldProductForm = () => {
     }));
 
   }, [selectedSection, supplierPurityData, formData.productType, userRole, sectionOptions]);
- console.log(formData)
+ // console.log(formData)
   // Handle product selection - populate melting and wastage
   useEffect(() => {
     if (!formData.product || !supplierPurityData.length) {
@@ -824,7 +824,7 @@ const GoldProductForm = () => {
         }));
       }
     } catch (error) {
-      console.error("Error compressing image:", error);
+      // console.error("Error compressing image:", error);
       setFormData((prev) => ({
         ...prev,
         photo: file,
@@ -909,7 +909,7 @@ const GoldProductForm = () => {
         showSnackbar("Product deleted successfully!", "error");
       }
     } catch (error) {
-      console.error("Error deleting record:", error);
+      // console.error("Error deleting record:", error);
       showSnackbar("Failed to delete product", "error");
     }
   };
@@ -945,7 +945,7 @@ const GoldProductForm = () => {
         showSnackbar(response.data.message);
       }
     } catch (error) {
-      console.error("Error submitting PO:", error);
+      // console.error("Error submitting PO:", error);
       showSnackbar(error.message || "Failed to submit Purchase Order", "error");
     }
   };
@@ -957,7 +957,7 @@ const GoldProductForm = () => {
       );
       setSubmittedData(response.data);
     } catch (error) {
-      console.error("Error fetching PO details:", error);
+      // console.error("Error fetching PO details:", error);
     }
   };
 
@@ -1090,7 +1090,7 @@ const GoldProductForm = () => {
         error.response?.data?.message || "Failed to add product",
         "error"
       );
-      console.error("Error submitting form:", error);
+      // console.error("Error submitting form:", error);
     }
   };
 

@@ -71,7 +71,7 @@ const DiamondQuotationApproval = () => {
   useEffect(() => {
     fetchQuotations(selectedSupplier);
   }, [selectedSupplier]);
-
+// console.log(selectedSupplier)
   // ── Approve / Reject ─────────────────────────────────────────
   const handleStatusChange = async (row, newStatus) => {
     const id = row.QuotationID ?? row._id;
