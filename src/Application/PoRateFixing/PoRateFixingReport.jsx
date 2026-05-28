@@ -12,6 +12,7 @@ function PoRateFixingReport() {
   const [poOptions, setPoOptions] = useState([]);
 
   const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [companyFilter, setCompanyFilter] = useState("all");
   const [selectedPo, setSelectedPo] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -41,6 +42,16 @@ function PoRateFixingReport() {
       .finally(() => setFetching(false));
   }, []);
 
+  const filterByCompany = (item) => {
+    if (companyFilter === "space") {
+      return typeof item.poNumber === "string" && item.poNumber.toUpperCase().startsWith("STPL");
+    }
+    if (companyFilter === "garsons") {
+      return typeof item.poNumber === "string" && item.poNumber.toUpperCase().startsWith("GPL");
+    }
+    return true;
+  };
+
   useEffect(() => {
     if (!selectedSupplier) {
       setPoOptions([]);
@@ -50,6 +61,7 @@ function PoRateFixingReport() {
     const poSet = new Map();
     allData
       .filter((item) => item.supplierCode === selectedSupplier)
+      .filter(filterByCompany)
       .forEach((item) => {
         if (item.poNumber) poSet.set(item.poNumber, item.poDate || "");
       });
@@ -59,7 +71,7 @@ function PoRateFixingReport() {
         .sort((a, b) => b.poDate.localeCompare(a.poDate))
     );
     setSelectedPo("");
-  }, [selectedSupplier, allData]);
+  }, [selectedSupplier, allData, companyFilter]);
 
   const parseDate = (item) => {
     try {
@@ -91,6 +103,7 @@ function PoRateFixingReport() {
     }
     setSearched(true);
     let data = allData.filter((item) => item.supplierCode === selectedSupplier);
+    data = data.filter(filterByCompany);
     if (selectedPo) data = data.filter((item) => item.poNumber === selectedPo);
     data = data.filter((item) => item.rate && parseFloat(item.rate) > 0);
     if (fromDate || toDate) {
@@ -269,6 +282,21 @@ function PoRateFixingReport() {
                 {suppliers.map((s, i) => (
                   <option key={i} value={s.value}>{s.name}</option>
                 ))}
+              </select>
+            </div>
+
+            <div className="min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company Filter
+              </label>
+              <select
+                value={companyFilter}
+                onChange={(e) => setCompanyFilter(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Companies</option>
+                <option value="space">Space (STPL)</option>
+                <option value="garsons">Garsons (GPL)</option>
               </select>
             </div>
 

@@ -72,7 +72,9 @@ import {
   DemoKycPurchaseApproval,
   DemoKycAcManagerApproval,
   DemoKycAprovalMis,
-  PoRateFixingReport 
+  PoRateFixingReport ,
+  DiamondPurEntry
+
 } from "../Components/ComponentRoutes";
 import { DiamondProvider } from "../Application/Diamond/DiamondGridContext/DiamondGridContext";
 import {
@@ -233,6 +235,11 @@ const sectionComponents = {
     "Diamond Excel Uploader": (
       <DiamondProvider>
         <DiamondManager />
+      </DiamondProvider>
+    ),
+    "Diamond Purchase Entry": (
+      <DiamondProvider>
+        <DiamondPurEntry />
       </DiamondProvider>
     ),
     "Diamond Purchase Entry Report": (

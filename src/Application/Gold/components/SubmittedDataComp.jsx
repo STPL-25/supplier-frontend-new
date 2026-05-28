@@ -1388,7 +1388,7 @@ function SubmittedDataComp({
         const poNumber = response.data.poNumber;
         if (
           poType?.trim().toLowerCase() === "unfix" &&
-          !poNumber?.includes("TCT")
+          !poNumber?.includes("TCT")||poNumber?.includes("GA")
         ) {
           await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
         }
@@ -1612,7 +1612,7 @@ function SubmittedDataComp({
         const poNumber = response.data.poNumber;
         if (
           poType?.trim().toLowerCase() === "unfix" &&
-          !poNumber?.includes("TCT")
+          !poNumber?.includes("TCT")||poNumber?.includes("GA")
         ) {
           await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
         }

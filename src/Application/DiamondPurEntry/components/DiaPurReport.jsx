@@ -628,6 +628,26 @@ const PurchaseReport = () => {
                   </section>
                 )}
 
+                {(selectedEntry.PTWt > 0 || selectedEntry.PTValue > 0 || selectedEntry.PTPurity) && (
+                  <section>
+                    <h4 className="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Platinum Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div><label className="text-xs text-gray-600 font-medium">Platinum Purity</label><div className="mt-1 p-2 bg-gray-50 rounded border">{selectedEntry.PTPurity || '-'}</div></div>
+                      <div><label className="text-xs text-gray-600 font-medium">Platinum Weight (g)</label><div className="mt-1 p-2 bg-gray-50 rounded border">{(selectedEntry.PTWt || 0).toFixed(3)}</div></div>
+                      <div><label className="text-xs text-gray-600 font-medium">Platinum Rate</label><div className="mt-1 p-2 bg-gray-50 rounded border">₹{(selectedEntry.PT999Rate || selectedEntry.PTRate || 0).toLocaleString('en-IN')}</div></div>
+                      <div><label className="text-xs text-gray-600 font-medium">Platinum Value</label><div className="mt-1 p-2 bg-gray-50 rounded border font-semibold">₹{(selectedEntry.PTValue || 0).toFixed(2)}</div></div>
+                    </div>
+
+                    {(selectedEntry.PTMcType || selectedEntry.PTMcRate || selectedEntry.PTMcAmount) && (
+                      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label className="text-xs text-gray-600 font-medium">Platinum MC Type</label><div className="mt-1 p-2 bg-gray-50 rounded border">{selectedEntry.PTMcType || '-'}</div></div>
+                        <div><label className="text-xs text-gray-600 font-medium">Platinum MC Rate</label><div className="mt-1 p-2 bg-gray-50 rounded border">₹{(selectedEntry.PTMcRate || 0).toLocaleString('en-IN')}</div></div>
+                        <div><label className="text-xs text-gray-600 font-medium">Platinum MC Amount</label><div className="mt-1 p-2 bg-gray-50 rounded border font-semibold">₹{(selectedEntry.PTMcAmount || 0).toLocaleString('en-IN')}</div></div>
+                      </div>
+                    )}
+                  </section>
+                )}
+
                 <section>
                   <h4 className="text-lg font-semibold mb-3 text-blue-600 border-b pb-2 flex items-center gap-2"><Diamond className="w-5 h-5" /> Diamonds Details</h4>
                   {(() => {

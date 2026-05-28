@@ -120,8 +120,11 @@ const POPage = ({
   // console.log(data)
   const type = data[0].type
   const rate = data[0].rate;
+  const poNumber = data[0].poNumber;
   const rateTypeLabel = type === "fix" ? "Fixed Rate" : type === "unfix" ? "Unfixed Rate" : type || "-";
-  const typeHeader = data[0].type === "fix" ? `Fixed Rate - ${data[0].rate} (Pure Rate with GST)` : data[0].type === "unfix" ? `Unfixed Rate - ${data[0].rate}` : data[0].type;
+  const typeHeader = data[0].type === "fix" &&!poNumber?.includes("TCT")? `Fixed Rate - ${data[0].rate} (Pure Rate with GST)` : 
+  data[0].type === "fix" &&poNumber?.includes("TCT")? `Fixed Rate - ${data[0].rate} (Pure Rate without GST)`:
+  data[0].type === "unfix" ? `Unfixed Rate - ${data[0].rate}` : data[0].type;
 
   return (
     <Page size="A4" style={styles.page}>
@@ -350,7 +353,7 @@ const POPage = ({
                       return "-";
                     }
                   })()} */}
-                   {poAddressData?.payment_Type||"IV"}
+                   {poAddressData?.payment_Type||""}
                 </Text>
               </Text>
               <Text style={styles.label}>

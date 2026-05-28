@@ -15,6 +15,7 @@ function PoRateFixing() {
 
   const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [companyFilter, setCompanyFilter] = useState("all");
   const [poItems, setPoItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(false);
   const [submitting, setSubmitting] = useState({});
@@ -92,47 +93,57 @@ function PoRateFixing() {
     }
   };
 
-  const getValidRateRange = (poNumber) => {
-    const firstItem = poItems.find((i) => i.poNumber === poNumber);
-    if (!firstItem) return null;
-
-    const metalType = (firstItem.metal_type || "").toLowerCase();
-    const isGold = metalType.includes("gold");
-    const isSilver = metalType.includes("silver");
-
-    const base999Rate = isGold
-      ? parseFloat(firstItem.gold999RateWithGST)
-      : isSilver
-        ? parseFloat(firstItem.silverPureRateWithGST)
-        : null;
-
-    let min = 0;
-    let max = Infinity;
-
-    if (base999Rate && base999Rate > 0) {
-      min = Math.max(min, base999Rate * 0.7);
-      max = Math.min(max, base999Rate * 1.3);
+  const filterItemsByCompany = (items) => {
+    if (companyFilter === "space") {
+      return items.filter((item) =>
+        typeof item.poNumber === "string" && item.poNumber.toUpperCase().startsWith("STPL"),
+      );
     }
-
-    const requestedRate = parseFloat(firstItem.requested_rate);
-    if (!isNaN(requestedRate) && requestedRate > 0) {
-      min = Math.max(min, requestedRate * 0.9);
-      max = Math.min(max, requestedRate * 1.1);
+    if (companyFilter === "garsons") {
+      return items.filter((item) =>
+        typeof item.poNumber === "string" && item.poNumber.toUpperCase().startsWith("GPL"),
+      );
     }
+    return items;
+  };
 
+  const getValidRateRange = (metal_type) => {
+    // Basic safe range: for silver restrict to 3 integer digits (<= 999)
+    // for others allow up to 5 integer digits (<= 99999).
+    const mt = String(metal_type || "").toLowerCase();
+    const isSilver = mt.includes("silver");
+    const max = isSilver ? 999 : 99999;
+    const min = 0;
     return { min: Math.round(min * 100) / 100, max: Math.round(max * 100) / 100 };
   };
 
-  const handlePoRateChange = (poNumber, value) => {
-    setPoRates((prev) => ({ ...prev, [poNumber]: value }));
+  const handlePoRateChange = (poNumber, value, metal_type) => {
+    // Enforce integer-digit limits based on metal type (silver -> 3, others -> 5)
+    const maxIntDigits = String(metal_type || "").toLowerCase().includes("silver") ? 3 : 5;
 
-    const numVal = parseFloat(value);
-    if (value === "" || isNaN(numVal)) {
+    // Allow clearing the field
+    if (value === "") {
+      setPoRates((prev) => ({ ...prev, [poNumber]: "" }));
       setRateErrors((prev) => ({ ...prev, [poNumber]: null }));
       return;
     }
 
-    const range = getValidRateRange(poNumber);
+    // Normalize input: remove non-digit except first dot
+    let sanitized = String(value).replace(/[^0-9.]/g, "");
+    const parts = sanitized.split(".");
+    const intPart = (parts[0] || "").slice(0, maxIntDigits);
+    const decPart = parts[1] ? parts[1].slice(0, 2) : ""; // allow up to 2 decimals
+    sanitized = decPart ? `${intPart}.${decPart}` : intPart;
+
+    setPoRates((prev) => ({ ...prev, [poNumber]: sanitized }));
+
+    const numVal = parseFloat(sanitized);
+    if (isNaN(numVal)) {
+      setRateErrors((prev) => ({ ...prev, [poNumber]: null }));
+      return;
+    }
+
+    const range = getValidRateRange(metal_type);
     if (range && (numVal < range.min || numVal > range.max)) {
       setRateErrors((prev) => ({
         ...prev,
@@ -164,14 +175,16 @@ function PoRateFixing() {
     return { rate100, rate995, rate999, gst100, gst995 };
   };
 
-  const groupedByPo = poItems.reduce((acc, item) => {
+  const filteredPoItems = filterItemsByCompany(poItems);
+
+  const groupedByPo = filteredPoItems.reduce((acc, item) => {
     const poNum = item.poNumber || "UNKNOWN";
     if (!acc[poNum]) acc[poNum] = [];
     acc[poNum].push(item);
     return acc;
   }, {});
 
-  const totals = poItems.reduce(
+  const totals = filteredPoItems.reduce(
     (acc, item) => {
       acc.pieces += parseInt(item.pieces ?? 0) || 0;
       acc.pureWt += parseFloat(item.pure_wt ?? 0) || 0;
@@ -240,48 +253,104 @@ function PoRateFixing() {
     }
 
     if (filteredItems && filteredItems.length > 0 && poData) {
-      await generatePdf(filteredItems, poData, orderTypes, poType?.trim());
+      await generatePdf(filteredItems, poData, orderTypes, poType?.trim(),);
     }
   };
 
   const openPreview = async (poNumber) => {
+    const items = groupedByPo[poNumber] || [];
+    if (items.length === 0) {
+      showSnackbar("No items found for this PO", "error");
+      return;
+    }
+
+    const enteredRate = parseFloat(poRates[poNumber]);
+    if (!enteredRate || enteredRate <= 0) {
+      showSnackbar("Please enter a valid rate before preview", "error");
+      return;
+    }
+
+    if (rateErrors[poNumber]) {
+      showSnackbar(rateErrors[poNumber], "error");
+      return;
+    }
+
+    if (previewBlobUrl) {
+      URL.revokeObjectURL(previewBlobUrl);
+    }
     setPreviewPoNumber(poNumber);
     setPreviewBlobUrl(null);
     setPreviewLoading(true);
+
     try {
-      let filteredItems = null;
-      let poData = null;
-      let orderTypes = null;
+      const filteredItems = items.map((item) => {
+        const pureWt = parseFloat(item.pure_wt) || 0;
+        const amount =
+          enteredRate > 0 && pureWt > 0
+            ? parseFloat((enteredRate * pureWt).toFixed(2))
+            : parseFloat(item.amount) || 0;
+        return { ...item, rate: enteredRate, amount };
+      });
 
-      for (const status of ["Pending", "Accepted", ""]) {
+      const parseJson = (val) => {
         try {
-          const pdfRes = await axios.post(`${API}/gold_po/fetch_po_creation/accounts`, {
-            selectedSupplier,
-            selectedPoNumber: poNumber,
-          
-          });
-          if (pdfRes.data?.data?.length > 0 && pdfRes.data?.address) {
-            filteredItems = pdfRes.data.data;
-            poData = pdfRes.data.address;
-            orderTypes = pdfRes.data.orderTypes;
-            break;
-          }
+          return typeof val === "string" ? JSON.parse(val) : val || {};
         } catch {
-          // try next status
+          return {};
         }
-      }
+      };
 
-      if (filteredItems && filteredItems.length > 0 && poData) {
-        const enteredRate = parseFloat(poRates[poNumber]);
-        filteredItems = filteredItems.map((item) => ({
-          ...item,
-          rate: enteredRate || item.rate,
-        }));
-        const url = await generatePdfBlobUrl(filteredItems, poData, orderTypes);
-        setPreviewBlobUrl(url);
+      const firstItem = items[0];
+      const poDetails = parsePoDetails(firstItem);
+      const companyDetails = parseJson(firstItem.our_company_details);
+      const supplierDetails = parseJson(firstItem.supplier);
+      const counterDetails = parseJson(firstItem.counterDetails);
+      const deliveryDetails = parseJson(firstItem.delivery);
+
+      const poData = {
+        from: {
+          name: companyDetails.name || "",
+          subTitle: companyDetails.subTitle || "",
+          doorNo: companyDetails.doorNo || "",
+          streetName: companyDetails.streetName || "",
+          city: companyDetails.city || "",
+          pincode: companyDetails.pincode || "",
+          phone: companyDetails.phone || "",
+          gstNo: companyDetails.gstNo || "",
+        },
+        supplier: {
+          name: supplierDetails.name || firstItem.supplierName || "",
+          doorNo: supplierDetails.doorNo || "",
+          streetName: supplierDetails.streetName || "",
+          city: supplierDetails.city || "",
+          pincode: supplierDetails.pincode || "",
+          phone: supplierDetails.phone || "",
+          gstNo: supplierDetails.gstNo || "",
+        },
+        poDetails: {
+          poNumber,
+          poDate: poDetails.poDate || firstItem.poDate || "",
+          dueDate: poDetails.dueDate || "",
+          mode: poDetails.mode || "",
+        },
+        counterDetails: {
+          purchaseManager: counterDetails.purchaseManager || "",
+          purchaseIncharge: counterDetails.purchaseIncharge || "",
+        },
+        delivery: deliveryDetails,
+        payment_Type: firstItem.payment_Type || deliveryDetails.paymentType || "IV",
+      };
+
+      const orderTypes = firstItem.orderType || "";
+      const url = await generatePdfBlobUrl(filteredItems, poData, orderTypes);
+      if (!url) {
+        throw new Error("PDF preview generation failed");
       }
-    } catch {
+      setPreviewBlobUrl(url);
+    } catch (err) {
+      console.error("PO preview error:", err);
       showSnackbar("Failed to load PDF preview", "error");
+      closePreview();
     } finally {
       setPreviewLoading(false);
     }
@@ -394,22 +463,39 @@ function PoRateFixing() {
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           PO Rate Fixing
         </h2>
-        <div className="max-w-xs">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Supplier
-          </label>
-          <select
-            value={selectedSupplier}
-            onChange={(e) => setSelectedSupplier(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select Supplier</option>
-            {suppliers.map((s, i) => (
-              <option key={i} value={s.value}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-2xl">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Supplier
+            </label>
+            <select
+              value={selectedSupplier}
+              onChange={(e) => setSelectedSupplier(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Supplier</option>
+              {suppliers.map((s, i) => (
+                <option key={i} value={s.value}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Company Filter
+            </label>
+            <select
+              value={companyFilter}
+              onChange={(e) => setCompanyFilter(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Companies</option>
+              <option value="space">Space (STPL)</option>
+              <option value="garsons">Garsons (GPL)</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -493,7 +579,6 @@ function PoRateFixing() {
                     const isLastInGroup = itemIdx === items.length - 1;
                     const amount = calcAmount(item);
                     const sno = poItems.indexOf(item) + 1;
-
                     return (
                       <>
                         <tr
@@ -549,7 +634,7 @@ function PoRateFixing() {
                           )}
 
                           {isFirstInGroup && (() => {
-                            const rateRange = getValidRateRange(poNumber);
+                            const rateRange = getValidRateRange(item.metal_type);
                             return (
                               <td
                                 className="px-3 py-3 text-center"
@@ -560,7 +645,7 @@ function PoRateFixing() {
                                   step="0.01"
                                   value={rate ?? ""}
                                   onChange={(e) =>
-                                    handlePoRateChange(poNumber, e.target.value)
+                                    handlePoRateChange(poNumber, e.target.value, item.metal_type)
                                   }
                                   className={`w-28 text-right p-1.5 border rounded-md focus:outline-none focus:ring-2 ${
                                     rateErrors[poNumber]
@@ -665,7 +750,7 @@ function PoRateFixing() {
                   <td className="px-3 py-3 text-right text-gray-800">
                     {totals.amount > 0 ? fmt(totals.amount) : "—"}
                   </td>
-                  <td className="px-3 py-3 text-center">
+                  {/* <td className="px-3 py-3 text-center">
                     {poNumbers.length > 1 && (
                       <button
                         onClick={handleSubmitAll}
@@ -677,7 +762,7 @@ function PoRateFixing() {
                           : "Submit All"}
                       </button>
                     )}
-                  </td>
+                  </td> */}
                 </tr>
               </tfoot>
             </table>

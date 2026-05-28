@@ -803,9 +803,11 @@
 
 
 import React, { useRef, useState, useMemo } from 'react';
+import axios from 'axios';
 import * as XLSX from 'xlsx-js-style';
 import { Upload, AlertCircle, CheckCircle, XCircle, Trash2, Send } from 'lucide-react';
 import { COLUMN_HEADER_MAP, FIELD_DATA_TYPES } from '../constants/diamondConstants';
+import { DIA_API } from '../../../config/configData';
 
 // ─── Sheet names exactly as in the Excel template ────────────────────────────
 const MAIN_SHEET_NAME    = 'Purchase Entry';
@@ -921,6 +923,356 @@ const validateBusinessRules = (mainData, diamondData, csData) => {
 
 
 // ─── Unified Error Card wrapper ───────────────────────────────────────────────
+const normalizeNumericValue = (value, decimals = 3) => {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? Number(value.toFixed(decimals)) : null;
+  }
+  const cleaned = String(value)
+    .replace(/carats?|cts?/gi, '')
+    .replace(/[\u20b9$,\s]/g, '')
+    .replace(/[^\d.-]/g, '');
+  if (!cleaned) return null;
+  const number = Number(cleaned);
+  if (!Number.isFinite(number)) return null;
+  return Number(number.toFixed(decimals));
+};
+
+const normalizeCaratNumber = (value) => normalizeNumericValue(value, 3);
+
+const normalizeRateNumber = (value) => normalizeNumericValue(value, 3);
+
+const normalizeShape = (value) => String(value ?? '')
+  .trim()
+  .toUpperCase()
+  .replace(/\b(DIAMOND|DIAMONDS|SHAPE|SHAPED)\b/g, '')
+  .replace(/[^A-Z0-9]/g, '');
+
+const formatMasterNumber = (value) => {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return '';
+  return number % 1 === 0 ? String(number) : number.toFixed(3);
+};
+
+const collectArrayLeaves = (value, arrays = []) => {
+  if (Array.isArray(value)) {
+    arrays.push(value);
+    value.forEach((item) => collectArrayLeaves(item, arrays));
+  } else if (value && typeof value === 'object') {
+    Object.values(value).forEach((item) => collectArrayLeaves(item, arrays));
+  }
+  return arrays;
+};
+
+const normalizeKeyName = (key) => key.replace(/[\s_-]/g, '').toLowerCase();
+
+const findValueByKeyPattern = (record, patterns, normalizer = (value) => value) => {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) return null;
+  for (const [key, value] of Object.entries(record)) {
+    const normalizedKey = normalizeKeyName(key);
+    if (patterns.some((pattern) => normalizedKey.includes(pattern))) {
+      const normalizedValue = normalizer(value);
+      if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== '') {
+        return { value: normalizedValue, key };
+      }
+    }
+  }
+  return null;
+};
+
+const findExactValueByKey = (record, keys, normalizer = (value) => value) => {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) return null;
+  const normalizedKeys = new Set(keys.map(normalizeKeyName));
+  for (const [key, value] of Object.entries(record)) {
+    if (!normalizedKeys.has(normalizeKeyName(key))) continue;
+    const normalizedValue = normalizer(value);
+    if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== '') {
+      return { value: normalizedValue, key };
+    }
+  }
+  return null;
+};
+
+const FROM_CARAT_PATTERNS = [
+  'caratfromweight', 'fromcaratweight', 'caratfrom', 'fromcarat',
+  'fromct', 'ctfrom', 'fromweight', 'fromwt',
+  'mincarat', 'minimumcarat', 'minct',
+  'fromcent', 'centfrom', 'mincent', 'minimumcent',
+];
+
+const TO_CARAT_PATTERNS = [
+  'caratt0weight', 'carattoweight', 't0caratweight', 'tocaratweight',
+  'caratto', 'tocarat', 'toct', 'ctto', 'toweight', 'towt',
+  'maxcarat', 'maximumcarat', 'maxct',
+  'tocent', 'centto', 'maxcent', 'maximumcent',
+];
+
+const SHAPE_PATTERNS = ['diamondshape', 'stoneshape', 'shape'];
+const RATE_PATTERNS = ['ratepercarat', 'rateperct', 'ratepct', 'diamondrate', 'diarate'];
+
+const findCaratByKeyPattern = (record, patterns) =>
+  findValueByKeyPattern(record, patterns, normalizeCaratNumber);
+
+const findRateByKeyPattern = (record) =>
+  findValueByKeyPattern(record, RATE_PATTERNS, normalizeRateNumber) ||
+  findExactValueByKey(record, ['rate'], normalizeRateNumber);
+
+const findShapeByKeyPattern = (record) =>
+  findValueByKeyPattern(record, SHAPE_PATTERNS, (value) => String(value ?? '').trim());
+
+const getRangeTypeFromKeys = (...keys) =>
+  keys.some((key) => normalizeKeyName(String(key || '')).includes('cent')) ? 'cent' : 'carat';
+
+const buildCaratMaster = (payload) => {
+  const arrayRows = collectArrayLeaves(payload).flat(Infinity);
+  const rows = (arrayRows.length > 0 ? arrayRows : [payload])
+    .filter((row) => row && typeof row === 'object' && !Array.isArray(row));
+  const ranges = [];
+  const rateRules = [];
+
+  rows.forEach((row) => {
+    const fromInfo = findCaratByKeyPattern(row, FROM_CARAT_PATTERNS);
+    const toInfo = findCaratByKeyPattern(row, TO_CARAT_PATTERNS);
+    if (!fromInfo || !toInfo) return;
+
+    const min = Math.min(fromInfo.value, toInfo.value);
+    const max = Math.max(fromInfo.value, toInfo.value);
+    const rangeType = getRangeTypeFromKeys(fromInfo.key, toInfo.key);
+    const range = { min, max, rangeType };
+    ranges.push(range);
+
+    const shapeInfo = findShapeByKeyPattern(row);
+    const rateInfo = findRateByKeyPattern(row);
+    const normalizedShape = normalizeShape(shapeInfo?.value);
+
+    if (normalizedShape && rateInfo) {
+      rateRules.push({
+        ...range,
+        shape: shapeInfo.value,
+        normalizedShape,
+        rate: rateInfo.value,
+      });
+    }
+  });
+
+  return {
+    ranges,
+    rateRules,
+    hasRules: ranges.length > 0 || rateRules.length > 0,
+    hasCentRanges: ranges.some((range) => range.rangeType === 'cent'),
+    hasCaratRanges: ranges.some((range) => range.rangeType === 'carat'),
+    hasRateRules: rateRules.length > 0,
+  };
+};
+
+const isValueAllowedForRangeType = (value, master, rangeType) => {
+  const number = normalizeCaratNumber(value);
+  if (number === null) return false;
+  return master.ranges.some((range) => (
+    range.rangeType === rangeType &&
+    number >= range.min &&
+    number <= range.max
+  ));
+};
+
+const normalizeStoneCount = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const number = Number(String(value).replace(/,/g, '').trim());
+  if (!Number.isFinite(number) || number <= 0) return null;
+  return number;
+};
+
+const calculateCent = (carat, noOfStones) => {
+  const caratNumber = normalizeCaratNumber(carat);
+  const stoneCount = normalizeStoneCount(noOfStones);
+  if (caratNumber === null || stoneCount === null) return null;
+  return Number((caratNumber / stoneCount).toFixed(3));
+};
+
+const describeCaratMaster = (master) => {
+  if (master.rateRules.length > 0) {
+    return master.rateRules
+      .slice(0, 6)
+      .map(({ shape, min, max, rangeType, rate }) =>
+        `${shape} ${min.toFixed(3)}-${max.toFixed(3)} ${rangeType} @ ${formatMasterNumber(rate)}`)
+      .join(', ');
+  }
+  if (master.ranges.length > 0) {
+    return master.ranges
+      .slice(0, 6)
+      .map(({ min, max, rangeType }) => `${min.toFixed(3)}-${max.toFixed(3)} ${rangeType}`)
+      .join(', ');
+  }
+  return '';
+};
+
+const isDetailRowUsed = (row) =>
+  Object.entries(row).some(([key, value]) => (
+    key !== 'purchaseEntryId' &&
+    key !== '_excelRowNumber' &&
+    value !== '' &&
+    value !== null &&
+    value !== undefined &&
+    value !== 0
+  ));
+
+const fetchCaratMaster = async (supplierCode) => {
+  const code = String(supplierCode || '').trim();
+  if (!code) {
+    throw new Error('Supplier code is missing. Cannot validate carat details.');
+  }
+
+  const response = await axios.get(`${DIA_API}/get_carat_master/${code}`);
+  const master = buildCaratMaster(response.data);
+  if (!master.hasRules) {
+    throw new Error(`No carat master rules found for supplier code ${code}.`);
+  }
+  return master;
+};
+
+const getRowShape = (row) => row.DiamondShape ?? row.csShape ?? row.Shape ?? '';
+
+const findMatchingRateRule = ({ master, shape, carat, calculatedCent }) => {
+  const normalizedShape = normalizeShape(shape);
+  if (!normalizedShape) return { status: 'missing-shape' };
+
+  const shapeRules = master.rateRules.filter((rule) => rule.normalizedShape === normalizedShape);
+  if (shapeRules.length === 0) return { status: 'missing-shape-master' };
+
+  const matchedRule = shapeRules.find((rule) => {
+    const lookupValue = rule.rangeType === 'cent' ? calculatedCent : carat;
+    return lookupValue !== null && lookupValue >= rule.min && lookupValue <= rule.max;
+  });
+
+  if (!matchedRule) return { status: 'missing-range', shapeRules };
+  return {
+    status: 'matched',
+    rule: matchedRule,
+    lookupValue: matchedRule.rangeType === 'cent' ? calculatedCent : carat,
+  };
+};
+
+const validateCaratDetails = async ({ diamondData, supplierCode }) => {
+  const hasCaratRows = diamondData.some(isDetailRowUsed);
+  if (!hasCaratRows) {
+    return { errors: [], masterSummary: '' };
+  }
+
+  const master = await fetchCaratMaster(supplierCode);
+  const errors = [];
+
+  const pushValidationError = (sheetName, row, idx, extra = {}) => {
+    errors.push({
+      sheetName,
+      rowNumber: row._excelRowNumber || idx + 2,
+      entryId: row.purchaseEntryId || '',
+      shape: getRowShape(row),
+      carat: row.Carat,
+      noOfStones: row.NoOfStones,
+      cent: '',
+      enteredRate: row.Rate,
+      masterRate: '',
+      range: '',
+      ...extra,
+    });
+  };
+
+  const checkRows = (rows, sheetName, { validateRate = false } = {}) => {
+    rows.forEach((row, idx) => {
+      if (!isDetailRowUsed(row)) return;
+
+      const caratNumber = normalizeCaratNumber(row.Carat);
+      if (caratNumber === null) {
+        pushValidationError(sheetName, row, idx, {
+          message: 'Carat is missing or invalid.',
+        });
+        return;
+      }
+
+      const calculatedCent = calculateCent(row.Carat, row.NoOfStones);
+      if (calculatedCent === null) {
+        pushValidationError(sheetName, row, idx, {
+          message: 'No Of Stones is missing or invalid.',
+        });
+        return;
+      }
+
+      if (master.hasCentRanges && !isValueAllowedForRangeType(calculatedCent, master, 'cent')) {
+        pushValidationError(sheetName, row, idx, {
+          cent: calculatedCent,
+          message: 'Calculated cent is outside the supplier cent range.',
+        });
+      }
+
+      if (!master.hasCentRanges && !master.hasRateRules && master.hasCaratRanges &&
+          !isValueAllowedForRangeType(caratNumber, master, 'carat')) {
+        pushValidationError(sheetName, row, idx, {
+          cent: calculatedCent,
+          message: 'Carat is outside the supplier carat range.',
+        });
+      }
+
+      if (!validateRate || !master.hasRateRules) return;
+
+      const rateNumber = normalizeRateNumber(row.Rate);
+      if (rateNumber === null) {
+        pushValidationError(sheetName, row, idx, {
+          cent: calculatedCent,
+          message: 'Rate is missing or invalid.',
+        });
+        return;
+      }
+
+      const match = findMatchingRateRule({
+        master,
+        shape: getRowShape(row),
+        carat: caratNumber,
+        calculatedCent,
+      });
+
+      if (match.status === 'missing-shape') {
+        pushValidationError(sheetName, row, idx, {
+          cent: calculatedCent,
+          message: 'Diamond Shape is missing. Cannot verify rate.',
+        });
+        return;
+      }
+
+      if (match.status === 'missing-shape-master') {
+        pushValidationError(sheetName, row, idx, {
+          cent: calculatedCent,
+          message: `No carat master rate found for shape "${getRowShape(row)}".`,
+        });
+        return;
+      }
+
+      if (match.status === 'missing-range') {
+        pushValidationError(sheetName, row, idx, {
+          cent: calculatedCent,
+          message: `No carat master rate found for shape "${getRowShape(row)}" and carat ${formatMasterNumber(caratNumber)}.`,
+        });
+        return;
+      }
+
+      if (Math.abs(rateNumber - match.rule.rate) > 0.001) {
+        pushValidationError(sheetName, row, idx, {
+          cent: calculatedCent,
+          masterRate: formatMasterNumber(match.rule.rate),
+          range: `${match.rule.min.toFixed(3)}-${match.rule.max.toFixed(3)} ${match.rule.rangeType}`,
+          message: `Rate wrongly entered. Expected ${formatMasterNumber(match.rule.rate)} for ${match.rule.shape}.`,
+        });
+      }
+    });
+  };
+
+  checkRows(diamondData, DIAMOND_SHEET_NAME, { validateRate: true });
+
+  return {
+    errors,
+    masterSummary: describeCaratMaster(master),
+  };
+};
+
 const ErrorCard = ({ icon: Icon, iconColor, borderColor, bgColor, headerColor, title, children, footerText, footerColor, footerBg, footerBorder }) => (
   <div className={`rounded-lg border-2 ${borderColor} ${bgColor} overflow-hidden`}>
     <div className={`flex items-center gap-2 px-4 py-3 border-b ${borderColor}`}>
@@ -1077,6 +1429,58 @@ const RuleErrorsNotice = ({ ruleErrors }) => (
 );
 
 // ─── Main Component ───────────────────────────────────────────────────────────
+const CaratErrorsNotice = ({ caratErrors, masterSummary }) => (
+  <ErrorCard
+    icon={XCircle}
+    iconColor="text-red-500"
+    borderColor="border-red-200"
+    bgColor="bg-red-50"
+    headerColor="text-red-800"
+    title={`Carat / Rate Master Validation Errors (${caratErrors.length})`}
+    footerText={masterSummary
+      ? `Master rules: ${masterSummary}. Fix the wrongly entered values and re-upload.`
+      : 'Fix the wrongly entered carat, no-of-stones, shape, or rate values and re-upload.'}
+    footerColor="text-red-800"
+    footerBg="bg-red-100"
+    footerBorder="border-red-200"
+  >
+    <div className="overflow-auto max-h-64 rounded border border-red-200 bg-white">
+      <table className="min-w-full text-xs">
+        <thead className="bg-red-100 sticky top-0">
+          <tr>
+            {[
+              '#', 'Sheet', 'Row', 'Entry Id', 'Shape', 'Carat',
+              'No Of Stones', 'Cent', 'Entered Rate', 'Master Rate', 'Range', 'Message',
+            ].map((h) => (
+              <th key={h} className="border-b border-red-200 px-3 py-2 text-left font-semibold text-red-800 whitespace-nowrap">
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {caratErrors.map((err, i) => (
+            <tr key={`${err.sheetName}-${err.rowNumber}-${i}`} className={i % 2 === 0 ? 'bg-white' : 'bg-red-50'}>
+              <td className="px-3 py-2 text-center text-gray-500">{i + 1}</td>
+              <td className="px-3 py-2 font-medium text-gray-800">{err.sheetName}</td>
+              <td className="px-3 py-2 font-medium text-gray-800">{err.rowNumber}</td>
+              <td className="px-3 py-2 font-mono text-blue-700">{err.entryId}</td>
+              <td className="px-3 py-2 font-mono text-red-700">{String(err.shape ?? '')}</td>
+              <td className="px-3 py-2 font-mono text-red-700">{String(err.carat ?? '')}</td>
+              <td className="px-3 py-2 font-mono text-red-700">{String(err.noOfStones ?? '')}</td>
+              <td className="px-3 py-2 font-mono text-red-700">{String(err.cent ?? '')}</td>
+              <td className="px-3 py-2 font-mono text-red-700">{String(err.enteredRate ?? '')}</td>
+              <td className="px-3 py-2 font-mono text-red-700">{String(err.masterRate ?? '')}</td>
+              <td className="px-3 py-2 font-mono text-red-700">{String(err.range ?? '')}</td>
+              <td className="px-3 py-2 text-gray-700">{err.message}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </ErrorCard>
+);
+
 const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, supplierCode }) => {
   const fileInputRef                                = useRef(null);
   const [status, setStatus]                         = useState(null);
@@ -1084,6 +1488,9 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
   const [ruleErrors, setRuleErrors]                 = useState([]);
   const [skippedRows, setSkippedRows]               = useState([]);
   const [duplicateDesignNos, setDuplicateDesignNos] = useState([]);
+  const [caratErrors, setCaratErrors]               = useState([]);
+  const [caratMasterSummary, setCaratMasterSummary] = useState('');
+  const [validatingCarats, setValidatingCarats]     = useState(false);
   const [hasData, setHasData]                       = useState(false);
   const [parsedGrouped, setParsedGrouped]           = useState(null);
   const [invoiceNo, setInvoiceNo]                   = useState('');
@@ -1098,6 +1505,9 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
     setRuleErrors([]);
     setSkippedRows([]);
     setDuplicateDesignNos([]);
+    setCaratErrors([]);
+    setCaratMasterSummary('');
+    setValidatingCarats(false);
     setHasData(false);
     setParsedGrouped(null);
     setInvoiceNo('');
@@ -1178,6 +1588,8 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
     setRuleErrors([]);
     setSkippedRows([]);
     setDuplicateDesignNos([]);
+    setCaratErrors([]);
+    setCaratMasterSummary('');
     setHasData(false);
     setParsedGrouped(null);
     setInvoiceNo('');
@@ -1185,7 +1597,7 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
     setSubmitError('');
 
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
         const wb = XLSX.read(evt.target.result, { type: 'binary' });
 
@@ -1211,6 +1623,14 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
         const rawCs = csSheet
           ? XLSX.utils.sheet_to_json(csSheet, { defval: '' })
           : [];
+        const rawDiamondsWithRows = rawDiamonds.map((row, index) => ({
+          row,
+          excelRowNumber: index + 2,
+        }));
+        const rawCsWithRows = rawCs.map((row, index) => ({
+          row,
+          excelRowNumber: index + 2,
+        }));
 
         if (allRawMain.length === 0) {
           setStatus({ type: 'error', message: 'No data rows found in the Purchase Entry sheet.' });
@@ -1246,11 +1666,11 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
           validRawMain.map((r) => String(r['Entry Id'] ?? '')).filter(Boolean)
         );
 
-        const filteredDiamonds = rawDiamonds.filter(
-          (row) => validEntryIdSet.has(String(row['Entry Id'] ?? ''))
+        const filteredDiamonds = rawDiamondsWithRows.filter(
+          ({ row }) => validEntryIdSet.has(String(row['Entry Id'] ?? ''))
         );
-        const filteredCs = rawCs.filter(
-          (row) => validEntryIdSet.has(String(row['Entry Id'] ?? ''))
+        const filteredCs = rawCsWithRows.filter(
+          ({ row }) => validEntryIdSet.has(String(row['Entry Id'] ?? ''))
         );
 
         if (validRawMain.length === 0) {
@@ -1282,7 +1702,7 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
         }
 
         // STEP 6: Map Diamond rows
-        const diamondData = filteredDiamonds.map((row) => ({
+        const diamondData = filteredDiamonds.map(({ row, excelRowNumber }) => ({
           purchaseEntryId: row['Entry Id']      || 0,
           STONE_FROM:      row['Stone From']    || null,
           DiamondShape:    row['Diamond Shape'] || null,
@@ -1291,10 +1711,11 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
           Rate:            row['Rate']          || 0,
           Value:           row['Value']         || 0,
           Weight:          row['Weight']        || 0,
+          _excelRowNumber: excelRowNumber,
         }));
 
         // STEP 7: Map Color Stone rows
-        const csData = filteredCs.map((row) => ({
+        const csData = filteredCs.map(({ row, excelRowNumber }) => ({
           purchaseEntryId: row['Entry Id']          || 0,
           csShape:         row['Color Stone Shape'] || null,
           NoOfStones:      row['No Of Stones']      || 0,
@@ -1302,6 +1723,7 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
           Rate:            row['Rate']              || 0,
           Value:           row['Value']             || 0,
           Weight:          row['Weight']            || 0,
+          _excelRowNumber: excelRowNumber,
         }));
 
         // STEP 8: Business rule validation — BLOCK SAVE
@@ -1314,19 +1736,55 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
           return;
         }
 
+        // STEP 9: Validate carat/shape/rate against supplier master
+        let caratValidation;
+        try {
+          setValidatingCarats(true);
+          caratValidation = await validateCaratDetails({
+            diamondData,
+            supplierCode,
+          });
+        } catch (err) {
+          setStatus({
+            type: 'error',
+            message: err.message || 'Unable to validate carat details. Please try again.',
+          });
+          setSkippedRows(skipped);
+          clearFileInput();
+          return;
+        } finally {
+          setValidatingCarats(false);
+        }
+
+        if (caratValidation.errors.length > 0) {
+          setCaratErrors(caratValidation.errors);
+          setCaratMasterSummary(caratValidation.masterSummary);
+          setSkippedRows(skipped);
+          setStatus({
+            type: 'error',
+            message: `Carat/rate validation failed (${caratValidation.errors.length}). Fix and re-upload.`,
+          });
+          clearFileInput();
+          return;
+        }
+
         // STEP 9: Group diamonds + color stones
         const grouped = mainData.map((entry) => {
           const idStr = String(entry.id ?? '');
           return {
             ...entry,
-            diamonds: diamondData.filter(
-              (d) => String(d.purchaseEntryId) === idStr &&
-                     Object.values(d).some((v) => v !== '' && v !== 0 && v !== null)
-            ),
-            colorStones: csData.filter(
-              (c) => String(c.purchaseEntryId) === idStr &&
-                     Object.values(c).some((v) => v !== '' && v !== 0 && v !== null)
-            ),
+            diamonds: diamondData
+              .filter(
+                (d) => String(d.purchaseEntryId) === idStr &&
+                       Object.entries(d).some(([key, value]) => key !== '_excelRowNumber' && value !== '' && value !== 0 && value !== null)
+              )
+              .map(({ _excelRowNumber, ...diamond }) => diamond),
+            colorStones: csData
+              .filter(
+                (c) => String(c.purchaseEntryId) === idStr &&
+                       Object.entries(c).some(([key, value]) => key !== '_excelRowNumber' && value !== '' && value !== 0 && value !== null)
+              )
+              .map(({ _excelRowNumber, ...colorStone }) => colorStone),
           };
         });
 
@@ -1334,6 +1792,8 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
         setTypeErrors([]);
         setRuleErrors([]);
         setDuplicateDesignNos([]);
+        setCaratErrors([]);
+        setCaratMasterSummary(caratValidation.masterSummary);
         setSkippedRows(skipped);
         setParsedGrouped(grouped);
         setHasData(true);
@@ -1345,6 +1805,9 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
         setRuleErrors([]);
         setSkippedRows([]);
         setDuplicateDesignNos([]);
+        setCaratErrors([]);
+        setCaratMasterSummary('');
+        setValidatingCarats(false);
         clearFileInput();
       }
     };
@@ -1362,19 +1825,19 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
         {/* Upload button */}
         <label
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors select-none ${
-            !selectedPO
+            !selectedPO || validatingCarats
               ? 'bg-blue-300 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700 cursor-pointer active:bg-blue-800'
           }`}
         >
           <Upload className="w-4 h-4 shrink-0" />
-          Upload Filled Excel
+          {validatingCarats ? 'Validating Master...' : 'Upload Filled Excel'}
           <input
             ref={fileInputRef}
             type="file"
             accept=".xlsx,.xls"
             onChange={handleFile}
-            disabled={!selectedPO}
+            disabled={!selectedPO || validatingCarats}
             className="hidden"
           />
         </label>
@@ -1415,11 +1878,19 @@ const TemplateUpload = ({ onDataLoaded, onReset, selectedPO, supplierName, suppl
         </div>
       )}
 
+      {validatingCarats && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium bg-blue-50 border-blue-200 text-blue-800">
+          <AlertCircle className="w-4 h-4 shrink-0 text-blue-500" />
+          <span>Validating diamond carat, shape, and rate details against supplier master...</span>
+        </div>
+      )}
+
       {/* ── Error / notice cards ─────────────────────────────────────────── */}
-      {skippedRows.length > 0        && <SkippedRowsNotice      skippedRows={skippedRows} />}
+      {/* {skippedRows.length > 0        && <SkippedRowsNotice      skippedRows={skippedRows} />} */}
       {duplicateDesignNos.length > 0 && <DuplicateDesignNoNotice duplicates={duplicateDesignNos} />}
       {typeErrors.length > 0         && <ValidationErrorsTable   errors={typeErrors} />}
       {ruleErrors.length > 0         && <RuleErrorsNotice         ruleErrors={ruleErrors} />}
+      {caratErrors.length > 0        && <CaratErrorsNotice        caratErrors={caratErrors} masterSummary={caratMasterSummary} />}
 
       {/* ── Summary + Invoice entry (shown after successful parse) ───────── */}
       {summary && (

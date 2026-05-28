@@ -351,7 +351,7 @@ const TemplateDownload = ({
     const { Gold, Diamond, Platinum } = poDetails.productAvlTypes;
 
     // Template 1: Gold + Platinum + Diamond
-    if (Gold && Platinum && Diamond) {
+    if (Gold && Platinum && Diamond || Gold && Platinum && !Diamond) {
       return {
         url: TEMPLATE_URLS.gold_platinum_diamond,
         filename: 'Diamond_Purchase_Gold_Platinum_Template.xlsx',

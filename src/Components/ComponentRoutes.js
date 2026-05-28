@@ -99,6 +99,7 @@ import RetailRates from "../Application/RetailRates/RetailRates";
 import DiamondQuotationApproval from "../Application/DiamondQuotationMaster/Pages/DiamondQuotationApproval";
 import PoRateFixing from "../Application/PoRateFixing/PoRateFixing";
 import CustomerOrderDetails from "../Application/CustomerOrder/CustomerOrderDetails";
+import DiamondPurEntry from "../Application/DiamondPurEntry/components/DiamondPurEntry";
 // import ChildPoTct from "../Application/Gold/components/ChildPoTct";
 export {
   DiamondMasterPage,
@@ -190,7 +191,8 @@ export {
   DemoKycAprovalMis,
   SupplierDebitCreditView,
   DebitCreditReport,
-  PoRateFixingReport
+  PoRateFixingReport,
+  DiamondPurEntry
   // ChildPoTct
   // SupplierOrder
 };

@@ -671,6 +671,56 @@ const PurchaseReport = () => {
                     </div>
                   </section>
                 )}
+{console.log(selectedEntry)}
+                {/* Platinum Details */}
+                {(selectedEntry.PTWt > 0 || selectedEntry.PTValue > 0 || selectedEntry.PTPurity) && (
+                  <section>
+                    <h4 className="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Platinum Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label className="text-xs text-gray-600 font-medium">Platinum Purity</label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border">{selectedEntry.PTPurity || '-'}</div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600 font-medium">Platinum Weight (g)</label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border">{(selectedEntry.PTWt || 0).toFixed(3)}</div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600 font-medium">Platinum Rate</label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border">₹{(selectedEntry.PTRate || selectedEntry.PTRatePer || 0).toLocaleString('en-IN')}</div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600 font-medium">Platinum Value</label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border font-semibold">₹{(selectedEntry.PTValue || 0).toFixed(2)}</div>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                {/* Platinum Details */}
+                {(selectedEntry.PTWt > 0 || selectedEntry.PTValue > 0) && (
+                  <section>
+                    <h4 className="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Platinum Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label className="text-xs text-gray-600 font-medium">Platinum Purity</label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border">{selectedEntry.PTPurity || selectedEntry.PTCarat || '-'}</div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600 font-medium">Platinum Weight (g)</label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border">{(selectedEntry.PTWt || 0).toFixed(3)}</div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600 font-medium">Platinum Value</label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border font-semibold">₹{(selectedEntry.PTValue || 0).toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600 font-medium">Platinum Karat</label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border">{selectedEntry.PTKarat || selectedEntry.PTCarat || '-'}</div>
+                      </div>
+                    </div>
+                  </section>
+                )}
 
                 {/* Diamonds Section */}
                 <section>
